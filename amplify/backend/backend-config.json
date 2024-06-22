@@ -1,0 +1,124 @@
+{
+  "api": {
+    "nothisistheone": {
+      "dependsOn": [],
+      "output": {
+        "authConfig": {
+          "additionalAuthenticationProviders": [
+            {
+              "authenticationType": "AWS_IAM"
+            }
+          ],
+          "defaultAuthentication": {
+            "apiKeyConfig": {
+              "apiKeyExpirationDays": 30,
+              "description": "api key description"
+            },
+            "authenticationType": "API_KEY"
+          }
+        }
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "AppSync"
+    }
+  },
+  "auth": {
+    "nothisistheone": {
+      "customAuth": false,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito",
+      "serviceType": "imported"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_auth_nothisistheone_allowUnauthenticatedIdentities": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nothisistheone"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nothisistheone_authRoleArn": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nothisistheone"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nothisistheone_authRoleName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nothisistheone"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nothisistheone_identityPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nothisistheone"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nothisistheone_identityPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nothisistheone"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nothisistheone_nativeClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nothisistheone"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nothisistheone_unauthRoleArn": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nothisistheone"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nothisistheone_unauthRoleName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nothisistheone"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nothisistheone_userPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nothisistheone"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nothisistheone_userPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nothisistheone"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nothisistheone_webClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nothisistheone"
+        }
+      ]
+    }
+  }
+}
