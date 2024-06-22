@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { generateClient } from 'aws-amplify/api';
 import { createLandfills } from './graphql/mutations';
+import { Autocomplete, Button, Chip, Input, Grid, Switch } from '@mantine/core';
 
 const AddLandfill = () => {
   const [landfill, setLandfill] = useState({
@@ -15,7 +16,10 @@ const AddLandfill = () => {
     active: false,
   });
   const client = generateClient();
+  const [checked, setChecked] = useState(false);
+
   const handleChange = (e) => {
+    console.log(e)
     const { name, value, type, checked } = e.target;
     setLandfill({
       ...landfill,
@@ -38,19 +42,47 @@ const AddLandfill = () => {
   };
 
   return (
+    
     <form onSubmit={handleSubmit}>
-      <input name="name" placeholder="Name" value={landfill.name} onChange={handleChange} required />
-      <input name="address" placeholder="Address" value={landfill.address} onChange={handleChange} required />
-      <input name="state" placeholder="State" value={landfill.state} onChange={handleChange} required />
-      <input name="city" placeholder="City" value={landfill.city} onChange={handleChange} required />
-      <input name="zip" placeholder="Zip" value={landfill.zip} onChange={handleChange} required />
-      <input name="lat" placeholder="Latitude" type="number" step="0.01" value={landfill.lat} onChange={handleChange} required />
-      <input name="lng" placeholder="Longitude" type="number" step="0.01" value={landfill.lng} onChange={handleChange} required />
-      <label>
-        Active
-        <input name="active" type="checkbox" checked={landfill.active} onChange={handleChange} />
-      </label>
-      <button type="submit">Add Landfill</button>
+        <Grid>
+            <Grid.Col span={12}><Input name="name" placeholder="Name" value={landfill.name} onChange={handleChange} required/></Grid.Col>
+            <Grid.Col span={12}><Input name="address" placeholder="Address" value={landfill.address} onChange={handleChange} required/></Grid.Col>
+            <Grid.Col span={4}><Input name="city" placeholder="City" value={landfill.city} onChange={handleChange} required/></Grid.Col>
+            {/* <Grid.Col span={4}>
+            <Autocomplete
+                placeholder="State"
+                name="state"
+                value={landfill.state} 
+                onChange={handleChange} 
+                required
+                data={[
+                    "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+                    "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+                    "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+                    "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
+                    "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
+                  ]}
+                />
+                </Grid.Col> */}
+            <Grid.Col span={4}><Input name="state" placeholder="State" value={landfill.state} onChange={handleChange} required/></Grid.Col>
+
+            <Grid.Col span={4}><Input name="zip" placeholder="ZIP" value={landfill.zip} onChange={handleChange} required/></Grid.Col>
+            <Grid.Col span={6}><Input name="lat" placeholder="Latitude"  type="number" step="0.01" value={landfill.lat} onChange={handleChange} required/></Grid.Col>
+            <Grid.Col span={6}><Input name="lng" placeholder="Longitude"  type="number" step="0.01" value={landfill.lng} onChange={handleChange} required/></Grid.Col>
+            <Grid.Col span={12}>
+            <Switch
+                defaultChecked
+                name="active" type="checkbox" onChange={handleChange} 
+                label="Active"
+                />                
+            </Grid.Col>
+            <Grid.Col span={12}>
+                <Button type="submit">Add Landfill</Button>
+            </Grid.Col>
+        </Grid>
+      
+      
+
     </form>
   );
 };
