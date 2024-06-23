@@ -1,14 +1,11 @@
 // src/App.js
 import React from 'react';
-import Landfills from './Landfills';
-import AddLandfill from './AddLandfill';
+import Nav from './Nav';
 
 const App = () => {
   return (
-    <div>
-      <h1>Landfill Management</h1>
-      <AddLandfill />
-      <Landfills />
+    <div>     
+       <Nav />
     </div>
   );
 };
