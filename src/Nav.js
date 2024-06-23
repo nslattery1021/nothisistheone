@@ -3,10 +3,21 @@ import React from 'react';
 import { Image, Tabs, rem } from '@mantine/core';
 import { IconBuildingFactory, IconCalendarMonth, IconFileDescription, IconPackages, IconPhoto, IconMessageCircle, IconSettings } from '@tabler/icons-react';
 import Landfills from "./Landfills";
+import { getCurrentUser } from 'aws-amplify/auth';
 
+async function currentAuthenticatedUser() {
+  try {
+    const { username, userId, signInDetails } = await getCurrentUser();
+    console.log(`The username: ${username}`);
+    console.log(`The userId: ${userId}`);
+    console.log(`The signInDetails: ${signInDetails}`);
+  } catch (err) {
+    console.log(err);
+  }
+}
 const Nav = () => {
     const iconStyle = { width: rem(20), height: rem(20) };
-
+    currentAuthenticatedUser()
   return (
     <Tabs defaultValue="gallery">
       <Tabs.List>
