@@ -87,7 +87,7 @@ const createSub = client.graphql({
     }
   };
   return (
-    <div>
+    <div style={{overflowX: "auto"}}>
       <h2>Landfills</h2>
       <Table highlightOnHover>
         <Table.Thead>
