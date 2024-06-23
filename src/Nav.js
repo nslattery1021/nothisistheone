@@ -5,6 +5,7 @@ import { IconBuildingFactory, IconCalendarMonth, IconFileDescription, IconPackag
 import LandfillMapList from "./LandfillMapList";
 import Settings from "./Settings";
 import { getCurrentUser } from 'aws-amplify/auth';
+import { NavLink } from 'react-router-dom';
 
 async function currentAuthenticatedUser() {
   try {
@@ -20,6 +21,11 @@ const Nav = () => {
     const iconStyle = { width: rem(20), height: rem(20) };
     currentAuthenticatedUser()
   return (
+    // <NavLink
+    //     href="#required-for-focus"
+    //     label="With icon"
+    //     leftSection={<IconBuildingFactory size="1rem" stroke={1.5} />}
+    //   />
     <Tabs defaultValue="gallery">
       <Tabs.List>
         <Tabs.Tab value="gallery">
@@ -30,7 +36,7 @@ const Nav = () => {
             src="APISlogo.png"
             />
         </Tabs.Tab>
-        <Tabs.Tab value="landfills" leftSection={<IconBuildingFactory stroke={1.1}  style={iconStyle} />}>
+        <Tabs.Tab value="landfills" component={NavLink} to="/landfills" leftSection={<IconBuildingFactory stroke={1.1}  style={iconStyle} />}>
           
         </Tabs.Tab>
         <Tabs.Tab value="dispatch" leftSection={<IconCalendarMonth stroke={1.1} style={iconStyle} />}>

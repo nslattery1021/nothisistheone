@@ -3,9 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { generateClient } from 'aws-amplify/api';
 import { listLandfills } from './graphql/queries';
 import { deleteLandfills } from './graphql/mutations';
+import LandfillProfile from './LandfillProfile'; // Adjust the path according to your project structure
+import { Link } from "react-router-dom";
 
 import { onCreateLandfills, onUpdateLandfills, onDeleteLandfills } from './graphql/subscriptions';
-import { Table, Button} from '@mantine/core';
+import { Table } from '@mantine/core';
 
 
 const LandfillMapList = () => {
@@ -89,20 +91,23 @@ const createSub = client.graphql({
   return (
     <div>
       <h2>Landfills</h2>
+     
       <Table highlightOnHover>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Name</Table.Th>
             <Table.Th>Address</Table.Th>
-            <Table.Th>Actions</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {landfills.length > 0 ? landfills.map((landfill) => (
 
             <Table.Tr key={landfill.id}>
-              <Table.Td>{landfill.name}</Table.Td>
               <Table.Td>
+              <Link to={`/landfill/${landfill.id}`}>{landfill.name}</Link>
+              {/* {landfill.name} */}
+                </Table.Td>
+              <Table.Td style={{fontSize: "0.85rem"}}>
                 <div>
                     {landfill.address}
                 </div>
@@ -110,9 +115,7 @@ const createSub = client.graphql({
                     {landfill.city} {landfill.state} {landfill.zip}
                 </div>
                 </Table.Td>
-              <Table.Td>
-                <Button color="red" onClick={() => handleDelete(landfill.id)}>Delete</Button>
-              </Table.Td>
+              
             </Table.Tr>
           )) : 
           <Table.Tr>
