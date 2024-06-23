@@ -5,7 +5,7 @@ import { IconBuildingFactory, IconCalendarMonth, IconFileDescription, IconPackag
 import Landfills from "./Landfills";
 
 const Nav = () => {
-    const iconStyle = { width: rem(12), height: rem(12) };
+    const iconStyle = { width: rem(20), height: rem(20) };
 
   return (
     <Tabs defaultValue="gallery">
@@ -19,20 +19,20 @@ const Nav = () => {
             src="APISlogo.png"
             />
         </Tabs.Tab>
-        <Tabs.Tab value="landfills" leftSection={<IconBuildingFactory style={iconStyle} />}>
-          Landfills
+        <Tabs.Tab value="landfills" leftSection={<IconBuildingFactory stroke={1.1}  style={iconStyle} />}>
+          
         </Tabs.Tab>
-        <Tabs.Tab value="dispatch" leftSection={<IconCalendarMonth style={iconStyle} />}>
-          Dispatch
+        <Tabs.Tab value="dispatch" leftSection={<IconCalendarMonth stroke={1.1} style={iconStyle} />}>
+          
         </Tabs.Tab>
-        <Tabs.Tab value="reports" leftSection={<IconFileDescription style={iconStyle} />}>
-          Reports
+        <Tabs.Tab value="reports" leftSection={<IconFileDescription stroke={1.1}  style={iconStyle} />}>
+    
         </Tabs.Tab>
-        <Tabs.Tab value="inventory" leftSection={<IconPackages style={iconStyle} />}>
-          Inventory
+        <Tabs.Tab value="inventory" leftSection={<IconPackages stroke={1.1} style={iconStyle} />}>
+          
         </Tabs.Tab>
-        <Tabs.Tab value="settings" leftSection={<IconSettings style={iconStyle} />}>
-          Settings
+        <Tabs.Tab value="settings" leftSection={<IconSettings stroke={1.1}  style={iconStyle} />}>
+          
         </Tabs.Tab>
       </Tabs.List>
 

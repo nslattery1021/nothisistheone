@@ -88,7 +88,7 @@ const createSub = client.graphql({
   };
   return (
     <Container>
-      <Title order={1}>Landfills</Title>
+      <h2>Landfills</h2>
       <Table highlightOnHover>
         <Table.Thead>
           <Table.Tr>
@@ -102,10 +102,12 @@ const createSub = client.graphql({
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {landfills.map((landfill) => (
+          {landfills.length > 0 ? landfills.map((landfill) => (
+
             <Table.Tr key={landfill.id}>
               <Table.Td>{landfill.name}</Table.Td>
-              <Table.Td>{landfill.address}</Table.Td>
+              <Table.Td>
+                {landfill.address}</Table.Td>
               <Table.Td>{landfill.city}</Table.Td>
               <Table.Td>{landfill.state}</Table.Td>
               <Table.Td>{landfill.zip}</Table.Td>
@@ -114,7 +116,10 @@ const createSub = client.graphql({
                 <Button color="red" onClick={() => handleDelete(landfill.id)}>Delete</Button>
               </Table.Td>
             </Table.Tr>
-          ))}
+          )) : 
+          <Table.Tr>
+            <Table.Td align='center' style={{color: 'rgba(0,0,0,0.87)'}} colSpan={7}>No landfills added yet.</Table.Td>
+            </Table.Tr>}
         </Table.Tbody>
       </Table>
     </Container>
