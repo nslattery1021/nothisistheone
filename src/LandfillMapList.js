@@ -5,10 +5,10 @@ import { listLandfills } from './graphql/queries';
 import { deleteLandfills } from './graphql/mutations';
 
 import { onCreateLandfills, onUpdateLandfills, onDeleteLandfills } from './graphql/subscriptions';
-import { Table, Button, Container, Loader, Title } from '@mantine/core';
+import { Table, Button} from '@mantine/core';
 
 
-const LandfillList = () => {
+const LandfillMapList = () => {
   const [landfills, setLandfills] = useState([]);
   const client = generateClient();
 
@@ -94,10 +94,6 @@ const createSub = client.graphql({
           <Table.Tr>
             <Table.Th>Name</Table.Th>
             <Table.Th>Address</Table.Th>
-            <Table.Th>City</Table.Th>
-            <Table.Th>State</Table.Th>
-            <Table.Th>Zip</Table.Th>
-            <Table.Th>Country</Table.Th>
             <Table.Th>Actions</Table.Th>
           </Table.Tr>
         </Table.Thead>
@@ -107,11 +103,13 @@ const createSub = client.graphql({
             <Table.Tr key={landfill.id}>
               <Table.Td>{landfill.name}</Table.Td>
               <Table.Td>
-                {landfill.address}</Table.Td>
-              <Table.Td>{landfill.city}</Table.Td>
-              <Table.Td>{landfill.state}</Table.Td>
-              <Table.Td>{landfill.zip}</Table.Td>
-              <Table.Td>{landfill.country}</Table.Td>
+                <div>
+                    {landfill.address}
+                </div>
+                <div>
+                    {landfill.city} {landfill.state} {landfill.zip}
+                </div>
+                </Table.Td>
               <Table.Td>
                 <Button color="red" onClick={() => handleDelete(landfill.id)}>Delete</Button>
               </Table.Td>
@@ -126,4 +124,4 @@ const createSub = client.graphql({
   );
 };
 
-export default LandfillList;
+export default LandfillMapList;

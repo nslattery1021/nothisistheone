@@ -2,7 +2,8 @@
 import React from 'react';
 import { Image, Tabs, rem } from '@mantine/core';
 import { IconBuildingFactory, IconCalendarMonth, IconFileDescription, IconPackages, IconPhoto, IconMessageCircle, IconSettings } from '@tabler/icons-react';
-import Landfills from "./Landfills";
+import LandfillMapList from "./LandfillMapList";
+import Settings from "./Settings";
 import { getCurrentUser } from 'aws-amplify/auth';
 
 async function currentAuthenticatedUser() {
@@ -23,7 +24,6 @@ const Nav = () => {
       <Tabs.List>
         <Tabs.Tab value="gallery">
         <Image
-            radius="md"
             height={35}
             width={35}
             fit="contain"
@@ -51,14 +51,12 @@ const Nav = () => {
         Gallery tab content
       </Tabs.Panel>
 
-      <Tabs.Panel value="landfills" style={{padding: "0.75rem"}}>
-        <h2>Landfill Management</h2>
-        
-        <Landfills />
+      <Tabs.Panel value="landfills" style={{padding: "0.75rem"}}>        
+        <LandfillMapList />
       </Tabs.Panel>
 
       <Tabs.Panel value="settings" style={{padding: "0.75rem"}}>
-        Settings tab content
+        <Settings />
       </Tabs.Panel>
     </Tabs>
   );

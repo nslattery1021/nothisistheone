@@ -3,8 +3,7 @@ import React, { useEffect, useState } from 'react';
 import LandfillList from './LandfillList';
 import AddLandfill from './AddLandfill';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, Button } from '@mantine/core';
-
+import { Flex, Modal, Button } from '@mantine/core';
 
 const Landfills = () => {
     const [opened, { open, close }] = useDisclosure(false);
@@ -12,11 +11,20 @@ const Landfills = () => {
     
   return (
 <div>
-<Modal opened={opened} onClose={close} title="Add Landfill">
+    <Modal opened={opened} onClose={close} title="Add Landfill">
        <AddLandfill />
-      </Modal>
+    </Modal>
+    <Flex
+      mih={50}
+      gap="sm"
+      justify="flex-end"
+      align="center"
+      direction="row"
+      wrap="nowrap"
+    >
+<Button onClick={open}>Open modal</Button>
+    </Flex>
 
-      <Button onClick={open}>Open modal</Button>
     <LandfillList />
 
 </div>
