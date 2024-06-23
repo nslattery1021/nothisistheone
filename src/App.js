@@ -74,7 +74,7 @@ function Layout() {
             width={35}
             style={{width: "35px"}}
             fit="contain"
-            src="APISlogo.png"
+            src="/APISlogo.png"
             /></Tabs.Tab>
       <Tabs.Tab value="landfills" leftSection={<IconBuildingFactory stroke={1.1} />}></Tabs.Tab>
       <Tabs.Tab value="dispatch" leftSection={<IconCalendarMonth stroke={1.1} />}></Tabs.Tab>
