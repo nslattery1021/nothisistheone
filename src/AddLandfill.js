@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { generateClient } from 'aws-amplify/api';
 import { createLandfills } from './graphql/mutations';
 import { Autocomplete, Button, Chip, Input, Grid, Switch } from '@mantine/core';
-import AutocompleteInput from './AutocompleteInput'; // Import the AutocompleteInput component
 
 const AddLandfill = () => {
   const [landfill, setLandfill] = useState({
@@ -49,7 +48,7 @@ const AddLandfill = () => {
     <form onSubmit={handleSubmit}>
         <Grid>
             <Grid.Col span={12}><Input name="name" placeholder="Name" value={landfill.name} onChange={handleChange} required/></Grid.Col>
-            <Grid.Col span={12}><AutocompleteInput /></Grid.Col>
+            <Grid.Col span={12}><Input name="address" placeholder="Address" value={landfill.address} onChange={handleChange} required/></Grid.Col>
             <Grid.Col span={4}><Input name="city" placeholder="City" value={landfill.city} onChange={handleChange} required/></Grid.Col>
             {/* <Grid.Col span={4}>
             <Autocomplete
