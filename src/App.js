@@ -9,6 +9,7 @@ import { IconBuildingFactory, IconCalendarMonth, IconFileDescription, IconPackag
 
 import Home from './Home'; // Ensure correct import path
 import LandfillMapList from './LandfillMapList'; // Ensure correct import path
+import LandfillProfile from './LandfillProfile'; // Ensure correct import path
 import Settings from './Settings'; // Ensure correct import path
 
 const App = () => {
@@ -25,6 +26,7 @@ const App = () => {
         <Route index element={<Home />} />
         <Route path="/landfills" element={<LandfillMapList />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/landfill/:id" element={<LandfillProfile />} />
 
         {/* Using path="*"" means "match anything", so this route
               acts like a catch-all for URLs that we don't have explicit
