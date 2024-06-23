@@ -90,34 +90,32 @@ const createSub = client.graphql({
     <Container>
       <Title order={1}>Landfills</Title>
       <Table highlightOnHover>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Address</th>
-            <th>City</th>
-            <th>State</th>
-            <th>Zip</th>
-            <th>Country</th>
-            <th>Description</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Name</Table.Th>
+            <Table.Th>Address</Table.Th>
+            <Table.Th>City</Table.Th>
+            <Table.Th>State</Table.Th>
+            <Table.Th>Zip</Table.Th>
+            <Table.Th>Country</Table.Th>
+            <Table.Th>Actions</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
           {landfills.map((landfill) => (
-            <tr key={landfill.id}>
-              <td>{landfill.name}</td>
-              <td>{landfill.address}</td>
-              <td>{landfill.city}</td>
-              <td>{landfill.state}</td>
-              <td>{landfill.zip}</td>
-              <td>{landfill.country}</td>
-              <td>{landfill.description}</td>
-              <td>
+            <Table.Tr key={landfill.id}>
+              <Table.Td>{landfill.name}</Table.Td>
+              <Table.Td>{landfill.address}</Table.Td>
+              <Table.Td>{landfill.city}</Table.Td>
+              <Table.Td>{landfill.state}</Table.Td>
+              <Table.Td>{landfill.zip}</Table.Td>
+              <Table.Td>{landfill.country}</Table.Td>
+              <Table.Td>
                 <Button color="red" onClick={() => handleDelete(landfill.id)}>Delete</Button>
-              </td>
-            </tr>
+              </Table.Td>
+            </Table.Tr>
           ))}
-        </tbody>
+        </Table.Tbody>
       </Table>
     </Container>
   );
