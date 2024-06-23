@@ -14,4 +14,8 @@ const App = ({ signOut, user }) => {
   );
 };
 
-export default withAuthenticator(App);
+const customAuthenticator = withAuthenticator(App, {
+  hideSignUp: true
+});
+
+export default customAuthenticator;
