@@ -70,6 +70,7 @@ function Layout() {
       <Tabs.Tab style={{flexGrow: 0}} value="home"><Image
             height={35}
             width={35}
+            style={{width: "35px"}}
             fit="contain"
             src="APISlogo.png"
             /></Tabs.Tab>
@@ -107,7 +108,7 @@ function Dashboard() {
 
 function NoMatch() {
   return (
-    <div>
+    <div style={{padding: "0.75rem"}}>
       <h2>Nothing to see here!</h2>
       <p>
         <Link to="/">Go to the home page</Link>

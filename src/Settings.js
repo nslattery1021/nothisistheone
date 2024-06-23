@@ -27,7 +27,7 @@ async function currentAuthenticatedUser() {
 const Nav = () => {
     currentAuthenticatedUser()
   return (
-    <div>
+    <div style={{padding: "0.75rem"}}>
         <Flex
       mih={50}
       gap="sm"
@@ -45,7 +45,7 @@ const Nav = () => {
           Landfills
         </Tabs.Tab> 
       </Tabs.List>
-      <Tabs.Panel value="landfills" style={{padding: "0.75rem"}}>        
+      <Tabs.Panel value="landfills">        
         <Landfills />
       </Tabs.Panel>
     </Tabs>
