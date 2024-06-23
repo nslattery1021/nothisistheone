@@ -89,7 +89,7 @@ const createSub = client.graphql({
     }
   };
   return (
-    <div>
+    <div style={{padding: "0.75rem"}}>
       <h2>Landfills</h2>
      
       <Table highlightOnHover>

@@ -67,7 +67,7 @@ function Layout() {
       onChange={(value) => navigate(`/${value}`)}
     >
       <Tabs.List>
-      <Tabs.Tab value="home"><Image
+      <Tabs.Tab style={{flexGrow: 0}} value="home"><Image
             height={35}
             width={35}
             fit="contain"
