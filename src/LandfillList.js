@@ -87,8 +87,10 @@ const createSub = client.graphql({
     }
   };
   return (
-    <div style={{overflowX: "auto"}}>
+    <div>
       <h2>Landfills</h2>
+      <div style={{overflowX: "auto"}}>
+
       <Table highlightOnHover>
         <Table.Thead>
           <Table.Tr>
@@ -122,8 +124,9 @@ const createSub = client.graphql({
             </Table.Tr>}
         </Table.Tbody>
       </Table>
-    </div>
-  );
+      </div>
+      </div>
+    );
 };
 
 export default LandfillList;

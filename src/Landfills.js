@@ -4,6 +4,7 @@ import LandfillList from './LandfillList';
 import AddLandfill from './AddLandfill';
 import { useDisclosure } from '@mantine/hooks';
 import { Flex, Modal, Button } from '@mantine/core';
+import { IconPlus } from '@tabler/icons-react';
 
 const Landfills = () => {
     const [opened, { open, close }] = useDisclosure(false);
@@ -22,7 +23,7 @@ const Landfills = () => {
       direction="row"
       wrap="nowrap"
     >
-<Button onClick={open}>Open modal</Button>
+<Button leftSection={<IconPlus size={14} />} onClick={open}>Add New</Button>
     </Flex>
 
     <LandfillList />
