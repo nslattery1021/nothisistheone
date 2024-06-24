@@ -9,7 +9,7 @@ const LandfillProfile = () => {
   const { id } = useParams();
   const [landfill, setLandfill] = useState(null);
   const [gasWells, setGasWells] = useState([]);
-
+  const isMobile = window.innerWidth <= 768;
   const client = generateClient();
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const LandfillProfile = () => {
     
     <div style={{height: "80%"}}>
       <h3 style={{padding: "0 0.75rem"}}>{landfill.name}</h3>
-      <div style={{position: 'relative'}}>
+      <div style={{position: 'absolute', top: '120px', height: isMobile ? '80%' : '90%', width: '100%'}}>
         <GoogleMapComponent lat={landfill.lat} lng={landfill.lng} gasWells={gasWells}/>
       </div>
     </div>

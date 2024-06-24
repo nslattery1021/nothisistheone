@@ -22,7 +22,7 @@ const mobileContainerStyle = {
     position: 'absolute',
     top: '10px',
     right: '10px',
-    zIndex: 1000 // Ensure the menu button is above the map
+    zIndex: 10 // Ensure the menu button is above the map
   };
 
   const options = {
