@@ -90,15 +90,10 @@ const createSub = client.graphql({
   };
   return (
     <div style={{padding: "0.75rem"}}>
-      <h2>Landfills</h2>
+      <h3>Landfills</h3>
      
       <Table highlightOnHover>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>Name</Table.Th>
-            <Table.Th>Address</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
+        
         <Table.Tbody>
           {landfills.length > 0 ? landfills.map((landfill) => (
 
@@ -106,7 +101,15 @@ const createSub = client.graphql({
               <Table.Td>
               {/* <Link to={`/landfill/${landfill.id}`}>{landfill.name}</Link> */}
               <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-              {landfill.name}
+                <div>
+                <div style={{fontWeight: 600}}>
+                    {landfill.name}
+                </div>
+                <div style={{color: 'rgba(0,0,0,0.6)', fontSize: '0.85rem'}}>
+                    {landfill.address}, {landfill.city} {landfill.state} {landfill.zip}
+                </div>
+                </div>
+                
               <Link to={`/landfill/${landfill.id}`}>
                 <ActionIcon variant="transparent" aria-label="Settings">
                     <IconMap style={{ width: '25px', height: '25px' }} stroke={1.5} />
@@ -114,14 +117,6 @@ const createSub = client.graphql({
                 </Link>
               </div>
               
-                </Table.Td>
-              <Table.Td style={{fontSize: "0.85rem"}}>
-                <div>
-                    {landfill.address}
-                </div>
-                <div>
-                    {landfill.city} {landfill.state} {landfill.zip}
-                </div>
                 </Table.Td>
               
             </Table.Tr>

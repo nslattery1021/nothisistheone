@@ -8,6 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { IconBuildingFactory, IconCalendarMonth, IconFileDescription, IconPackages, IconInfoSquareRounded, IconMessageCircle, IconSettings } from '@tabler/icons-react';
 
 import Home from './Home'; // Ensure correct import path
+import Inventory from './Inventory'; // Ensure correct import path
 import LandfillMapList from './LandfillMapList'; // Ensure correct import path
 import LandfillProfile from './LandfillProfile'; // Ensure correct import path
 import Settings from './Settings'; // Ensure correct import path
@@ -28,6 +29,7 @@ const App = () => {
         <Route path="/landfills" element={<LandfillMapList />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/example" element={<ExampleComponent />} />
+        <Route path="/inventory" element={<Inventory />} />
         <Route path="/landfill/:id" element={<LandfillProfile />} />
 
         {/* Using path="*"" means "match anything", so this route
