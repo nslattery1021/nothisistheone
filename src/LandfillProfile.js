@@ -93,7 +93,7 @@ const LandfillProfile = () => {
   return (
     
     <div style={{height: "70%"}}>
-      <h3 style={{padding: "0 0.75rem"}}>{landfill.name}</h3>
+      <h3 style={{padding: "0.75rem"}}>{landfill.name}</h3>
       <div style={{position: 'absolute', top: '120px', height: isMobile ? '70%' : '90%', width: '100%'}}>
         <GoogleMapComponent lat={landfill.lat} lng={landfill.lng} gasWells={gasWells}/>
       </div>

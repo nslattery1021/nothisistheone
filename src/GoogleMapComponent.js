@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { GoogleMap, LoadScript, InfoWindow, OverlayView, useLoadScript } from '@react-google-maps/api';
-import { Input, Menu, Modal, Divider, ActionIcon, rem } from '@mantine/core';
+import { Badge, Group, Input, Menu, Modal, Divider, ActionIcon, rem } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconInfoCircle, IconPackage, IconCpu, IconTool, IconMenu2, IconPlus, IconAdjustmentsHorizontal } from '@tabler/icons-react';
+import { IconGaugeFilled, IconInfoCircle, IconPackage, IconCpu, IconTool, IconMenu2, IconPlus, IconAdjustmentsHorizontal } from '@tabler/icons-react';
 import AddGasWell from './AddGasWell';
+import { Icon, Label } from 'semantic-ui-react';
 
 const containerStyle = {
   width: '100%',
@@ -97,23 +98,20 @@ const GoogleMapComponent = ({ lat, lng, gasWells }) => {
             position={{ lat: well.lat, lng: well.lng }}
             mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
           >
-            <div
+            <Label
+             pointing='below'
+              onClick={() => setSelectedWell(well)}
               style={{
                 background: markerBackground,
                 color: 'white',
-                padding: '5px',
-                borderRadius: '3px',
-                fontSize: '12px',
                 width: '125px',
-                willChange: 'transform',
                 transform: 'translate(-50%, -100%) translate(0, 0)',
-                boxShadow: '0 1px 4px rgba(0, 0, 0, 0.3)',
               }}
-              onClick={() => setSelectedWell(well)}
             >
               <h3 style={{margin: '0'}}>{well.gasWellName}</h3>
               <div>{well.subtype}</div>
-            </div>
+            </Label>
+            
           </OverlayView>
           ))}
           {selectedWell && (
@@ -123,14 +121,20 @@ const GoogleMapComponent = ({ lat, lng, gasWells }) => {
             //   options={{pixelOffset : isLoaded ? new google.maps.Size(0, -50) : 0}}
             >
               <div>
-                <h3 style={{margin: '0',fontSize: '1rem'}}>{selectedWell.gasWellName}</h3>
+                <h3 style={{margin: '0'}}>{selectedWell.gasWellName}</h3>
                 <div style={{fontSize: '0.85rem'}}>{selectedWell.type} • {selectedWell.subtype}</div>
+                <div style={{display: 'flex', marginTop: '0.5rem', gap: '0.25rem'}}>
+                  {/* <Label color="blue">Badge</Label>
+                  <Label color="blue">Badge</Label>
+                  <Label><Icon name='tachometer alternate' /> 23</Label>
+                  <Label color="blue" leftSection={<IconGaugeFilled style={{ width: rem(14), height: rem(14) }} />}>Badge</Label> */}
+                </div>
+                
                 <ActionIcon.Group fullWidth style={{marginTop: '1rem', width: '100%'}}>
                     <ActionIcon variant="light" color="gray" size="lg" style={{flexGrow: 1}}><IconInfoCircle size={20} stroke={2} /></ActionIcon>
                     <ActionIcon variant="light" color="gray" size="lg" style={{flexGrow: 1}}><IconPackage size={20} stroke={2} /></ActionIcon>
                     <ActionIcon variant="light" color="gray"size="lg" style={{flexGrow: 1}}><IconCpu size={20} stroke={2} /></ActionIcon>
                     <ActionIcon variant="light" color="gray" size="lg" style={{flexGrow: 1}}><IconTool size={20} stroke={2} /></ActionIcon>
-
                 </ActionIcon.Group>
               </div>
             </InfoWindow>

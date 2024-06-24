@@ -5,6 +5,8 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css'; // Import Mantine core styles
+import 'semantic-ui-css/semantic.min.css';
+
 import { BrowserRouter } from "react-router-dom";
 
 import { Amplify } from 'aws-amplify';
