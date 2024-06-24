@@ -1,3 +1,27 @@
+type Devices @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  macAddress: String
+  deviceName: String
+  iccid: String
+  serialNum: String
+  deviceType: String
+  landfillsID: ID! @index(name: "byLandfills")
+  flowMeter: String
+  restrictionSize: Float
+  pipeSize: Float
+}
+
+type GasWells @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  gasWellName: String!
+  lat: Float!
+  lng: Float!
+  type: String
+  subtype: String
+  landfillsID: ID! @index(name: "byLandfills")
+  Devices: Devices @hasOne
+}
+
 type Landfills @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String
@@ -9,4 +33,7 @@ type Landfills @model @auth(rules: [{allow: public}]) {
   lat: Float
   lng: Float
   active: Boolean
+  GasWells: [GasWells] @hasMany(indexName: "byLandfills", fields: ["id"])
+  Devices: [Devices] @hasMany(indexName: "byLandfills", fields: ["id"])
 }
+ 

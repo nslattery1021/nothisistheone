@@ -5,12 +5,13 @@ import '@aws-amplify/ui-react/styles.css';
 import { Image, Tabs } from '@mantine/core';
 import { Routes, Route, Outlet, Link } from "react-router-dom";
 import { useNavigate, useParams } from 'react-router-dom';
-import { IconBuildingFactory, IconCalendarMonth, IconFileDescription, IconPackages, IconPhoto, IconMessageCircle, IconSettings } from '@tabler/icons-react';
+import { IconBuildingFactory, IconCalendarMonth, IconFileDescription, IconPackages, IconInfoSquareRounded, IconMessageCircle, IconSettings } from '@tabler/icons-react';
 
 import Home from './Home'; // Ensure correct import path
 import LandfillMapList from './LandfillMapList'; // Ensure correct import path
 import LandfillProfile from './LandfillProfile'; // Ensure correct import path
 import Settings from './Settings'; // Ensure correct import path
+import ExampleComponent from './ExampleComponent'; // Ensure correct import path
 
 const App = () => {
 
@@ -23,9 +24,10 @@ const App = () => {
           parent route elements. See the note about <Outlet> below. */}
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
+        <Route index path="/home" element={<Home />} />
         <Route path="/landfills" element={<LandfillMapList />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/example" element={<ExampleComponent />} />
         <Route path="/landfill/:id" element={<LandfillProfile />} />
 
         {/* Using path="*"" means "match anything", so this route
@@ -80,8 +82,9 @@ function Layout() {
       <Tabs.Tab value="dispatch" leftSection={<IconCalendarMonth stroke={1.1} />}></Tabs.Tab>
       <Tabs.Tab value="reports" leftSection={<IconFileDescription stroke={1.1} />}></Tabs.Tab>
       <Tabs.Tab value="inventory" leftSection={<IconPackages stroke={1.1} />}></Tabs.Tab>
-
       <Tabs.Tab value="settings" leftSection={<IconSettings stroke={1.1} />}></Tabs.Tab>
+      <Tabs.Tab value="example" leftSection={<IconInfoSquareRounded stroke={1.1} />}></Tabs.Tab>
+
       </Tabs.List>
     </Tabs>
 

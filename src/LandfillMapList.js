@@ -5,9 +5,9 @@ import { listLandfills } from './graphql/queries';
 import { deleteLandfills } from './graphql/mutations';
 import LandfillProfile from './LandfillProfile'; // Adjust the path according to your project structure
 import { Link } from "react-router-dom";
-
+import { IconMap } from '@tabler/icons-react';
 import { onCreateLandfills, onUpdateLandfills, onDeleteLandfills } from './graphql/subscriptions';
-import { Table } from '@mantine/core';
+import { ActionIcon, Table } from '@mantine/core';
 
 
 const LandfillMapList = () => {
@@ -104,8 +104,16 @@ const createSub = client.graphql({
 
             <Table.Tr key={landfill.id}>
               <Table.Td>
-              <Link to={`/landfill/${landfill.id}`}>{landfill.name}</Link>
-              {/* {landfill.name} */}
+              {/* <Link to={`/landfill/${landfill.id}`}>{landfill.name}</Link> */}
+              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+              {landfill.name}
+              <Link to={`/landfill/${landfill.id}`}>
+                <ActionIcon variant="transparent" aria-label="Settings">
+                    <IconMap style={{ width: '25px', height: '25px' }} stroke={1.5} />
+                </ActionIcon>
+                </Link>
+              </div>
+              
                 </Table.Td>
               <Table.Td style={{fontSize: "0.85rem"}}>
                 <div>

@@ -1,14 +1,15 @@
 // src/App.js
 import React from 'react';
-import Nav from './Nav';
-
 
 const Home = () => {
 
   return (
-    <div>
-        Hi
+    <div style={{padding: "0.75rem"}}>
+<h3>
+        Overview
+    </h3>
     </div>
+    
   );
 };
 
