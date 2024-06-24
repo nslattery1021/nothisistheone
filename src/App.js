@@ -2,7 +2,7 @@
 import React from 'react';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
-import { Image, Tabs } from '@mantine/core';
+import { Image, Tabs, rem } from '@mantine/core';
 import { Routes, Route, Outlet, Link } from "react-router-dom";
 import { useNavigate, useParams } from 'react-router-dom';
 import { IconBuildingFactory, IconCalendarMonth, IconFileDescription, IconPackages, IconInfoSquareRounded, IconMessageCircle, IconSettings } from '@tabler/icons-react';
@@ -39,6 +39,7 @@ const App = () => {
   );
 };
 function Layout() {
+  const iconStyle = { width: rem(20), height: rem(20) };
   const navigate = useNavigate();
   const { tabValue } = useParams();
   return (
@@ -78,12 +79,12 @@ function Layout() {
             fit="contain"
             src="/APISlogo.png"
             /></Tabs.Tab>
-      <Tabs.Tab value="landfills" leftSection={<IconBuildingFactory stroke={1.1} />}></Tabs.Tab>
-      <Tabs.Tab value="dispatch" leftSection={<IconCalendarMonth stroke={1.1} />}></Tabs.Tab>
-      <Tabs.Tab value="reports" leftSection={<IconFileDescription stroke={1.1} />}></Tabs.Tab>
-      <Tabs.Tab value="inventory" leftSection={<IconPackages stroke={1.1} />}></Tabs.Tab>
-      <Tabs.Tab value="settings" leftSection={<IconSettings stroke={1.1} />}></Tabs.Tab>
-      <Tabs.Tab value="example" leftSection={<IconInfoSquareRounded stroke={1.1} />}></Tabs.Tab>
+      <Tabs.Tab value="landfills" leftSection={<IconBuildingFactory stroke={1.1} style={iconStyle}/>}></Tabs.Tab>
+      <Tabs.Tab value="dispatch" leftSection={<IconCalendarMonth stroke={1.1} style={iconStyle} />}></Tabs.Tab>
+      <Tabs.Tab value="reports" leftSection={<IconFileDescription stroke={1.1} style={iconStyle} />}></Tabs.Tab>
+      <Tabs.Tab value="inventory" leftSection={<IconPackages stroke={1.1} style={iconStyle} />}></Tabs.Tab>
+      <Tabs.Tab value="settings" leftSection={<IconSettings stroke={1.1} style={iconStyle} />}></Tabs.Tab>
+      {/* <Tabs.Tab value="example" leftSection={<IconInfoSquareRounded stroke={1.1} style={iconStyle} />}></Tabs.Tab> */}
 
       </Tabs.List>
     </Tabs>
