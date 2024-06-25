@@ -72,6 +72,7 @@ function Layout() {
 <Tabs
       value={tabValue}
       onChange={(value) => navigate(`/${value}`)}
+      defaultValue="home"
     >
       <Tabs.List>
       <Tabs.Tab style={{flexGrow: 0}} value="home"><Image

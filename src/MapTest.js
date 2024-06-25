@@ -6,7 +6,7 @@ import { useDisclosure } from '@mantine/hooks';
 import MarkerWithInfoWindow from './MarkerWithInfoWindow';
 import AddGasWell from './AddGasWell';
 
-const GoogleMapComponent = ({ lat, lng, gasWells }) => {
+const MapTest = ({ lat, lng, gasWells }) => {
     const [opened, { open, close }] = useDisclosure(false);
     const [markerRef, marker] = useMarkerRef();
 
@@ -75,5 +75,4 @@ const GoogleMapComponent = ({ lat, lng, gasWells }) => {
     );
   }
 
-  export default GoogleMapComponent;
-
+  export default MapTest;
