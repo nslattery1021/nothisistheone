@@ -8,7 +8,7 @@ import { Badge, Group, Input, Menu, Modal, Divider, ActionIcon, rem } from '@man
 import { Icon, Label } from 'semantic-ui-react';
 
  
-const MarkerWithInfoWindow = ({ props }) => {
+const MarkerWithInfoWindow = ({ props, openDrawer }) => {
   const [markerRef, marker] = useAdvancedMarkerRef();
   const [infoWindowShown, setInfoWindowShown] = useState(false);
 
@@ -35,8 +35,8 @@ const MarkerWithInfoWindow = ({ props }) => {
         ref={markerRef}
         onClick={handleMarkerClick}
       >
-       
           <Label
+          key={props.id}
              pointing='below'
               style={{
                 background: markerBackground,
@@ -64,7 +64,7 @@ const MarkerWithInfoWindow = ({ props }) => {
                 <ActionIcon variant="light" color="gray" size="lg" style={{flexGrow: 1}}><IconInfoCircle size={20} stroke={2} /></ActionIcon>
                 <ActionIcon variant="light" color="gray" size="lg" style={{flexGrow: 1}}><IconPackage size={20} stroke={2} /></ActionIcon>
                 <ActionIcon variant="light" color="gray"size="lg" style={{flexGrow: 1}}><IconCpu size={20} stroke={2} /></ActionIcon>
-                <ActionIcon variant="light" color="gray" size="lg" style={{flexGrow: 1}}><IconTool size={20} stroke={2} /></ActionIcon>
+                <ActionIcon variant="light" color="gray" size="lg" onClick={openDrawer} style={{flexGrow: 1}}><IconTool size={20} stroke={2} /></ActionIcon>
             </ActionIcon.Group>
           </div>
         </InfoWindow>

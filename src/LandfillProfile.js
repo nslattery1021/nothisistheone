@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/api';
 import { getLandfills, gasWellsByLandfillsID } from './graphql/queries';
-import { Modal, Title, Text } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { Drawer, Button } from '@mantine/core';
 import GoogleMapComponent from './GoogleMapComponent'; // Ensure correct import path
 import { onCreateGasWells, onUpdateGasWells, onDeleteGasWells } from './graphql/subscriptions';
 
@@ -10,6 +11,8 @@ const LandfillProfile = () => {
   const { id } = useParams();
   const [landfill, setLandfill] = useState(null);
   const [gasWells, setGasWells] = useState([]);
+  const [opened, { open, close }] = useDisclosure(false);
+
   const isMobile = window.innerWidth <= 768;
   const client = generateClient();
 
@@ -91,13 +94,23 @@ const LandfillProfile = () => {
   }
 
   return (
-    
-    <div style={{height: "70%"}}>
-      <h3 style={{padding: "0.75rem"}}>{landfill.name}</h3>
-      <div style={{position: 'absolute', top: '120px', height: isMobile ? '70%' : '90%', width: '100%'}}>
-        <GoogleMapComponent lat={landfill.lat} lng={landfill.lng} gasWells={gasWells}/>
-      </div>
+      <div>
+      <Drawer position="right" opened={opened} onClose={close} title="Authentication">
+        {/* Drawer content */}
+      </Drawer>
+      {/* <Button onClick={open}>Open Drawer</Button> */}
+
+        <h3 style={{padding: "0.75rem"}}>{landfill.name}</h3>
+        <div style={{position: 'absolute', top: '120px', height: isMobile ? '70%' : '90%', width: '100%'}}>
+          <GoogleMapComponent           
+          openDrawer={open}
+          lat={landfill.lat} 
+          lng={landfill.lng} 
+          gasWells={gasWells}/>
+        </div>
+        
     </div>
+    
   );
 };
 

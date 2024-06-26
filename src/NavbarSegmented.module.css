@@ -1,0 +1,50 @@
+.navbar {
+    background-color: #333;
+    padding: 1rem;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+  }
+  
+  .title {
+    margin-bottom: 1rem;
+    color: #ccc;
+  }
+  
+  .navbarMain {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .footer {
+    padding: 1rem 0;
+    border-top: 1px solid #444;
+  }
+  
+  .link {
+    display: flex;
+    align-items: center;
+    color: #ccc;
+    text-decoration: none;
+    padding: 0.5rem 0;
+    transition: color 0.3s ease;
+  
+    &:hover {
+      color: #fff;
+    }
+  }
+  
+  .linkIcon {
+    margin-right: 0.5rem;
+    stroke: #ccc;
+    transition: stroke 0.3s ease;
+  
+    &:hover {
+      stroke: #fff;
+    }
+  }
+  
