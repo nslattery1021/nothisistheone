@@ -96,9 +96,8 @@ const LandfillProfile = () => {
   return (
       <div>
       <Drawer position="right" opened={opened} onClose={close} title="Authentication">
-        {/* Drawer content */}
+        <div>Hi</div>
       </Drawer>
-      {/* <Button onClick={open}>Open Drawer</Button> */}
 
         <h3 style={{padding: "0.75rem"}}>{landfill.name}</h3>
         <div style={{position: 'absolute', top: '120px', height: isMobile ? '70%' : '90%', width: '100%'}}>
