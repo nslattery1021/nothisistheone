@@ -1,22 +1,31 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/api';
-import { getLandfills, getGasWells, gasWellsByLandfillsID } from './graphql/queries';
 import { useDisclosure } from '@mantine/hooks';
-import { Accordion, Divider, Drawer, Button, Group, Timeline, Text } from '@mantine/core';
-import GoogleMapComponent from './GoogleMapComponent'; // Ensure correct import path
-import { onCreateGasWells, onUpdateGasWells, onDeleteGasWells } from './graphql/subscriptions';
+import { Accordion, Divider, Drawer, Button, Group, Modal, Timeline, Text } from '@mantine/core';
+import { showNotification } from '@mantine/notifications';
 import { IconDots, IconTool } from '@tabler/icons-react';
 import moment from 'moment';
+
+import { getLandfills, getGasWells, gasWellsByLandfillsID } from './graphql/queries';
+import { createGasWells } from './graphql/mutations';
+import { onCreateGasWells, onUpdateGasWells, onDeleteGasWells } from './graphql/subscriptions';
+
+import AddGasWell from './AddGasWell';
+import GoogleMapComponent from './GoogleMapComponent'; // Ensure correct import path
+import ServiceRequestWindow from './ServiceRequestWindow'; // Ensure correct import path
 
 const LandfillProfile = () => {
   const { id } = useParams();
   const [landfill, setLandfill] = useState(null);
   const [gasWells, setGasWells] = useState([]);
   const [opened, { open, close }] = useDisclosure(false);
+  const [openedModal, { open: openModal, close: closeModal }] = useDisclosure(false);
   const [openAccordion, setOpenAccordion] = useState([]);
   const [drawerContent, setDrawerContent] = useState('');
   const [selectedGasWell, setSelectedGasWell] = useState(null);
+  const [addWellOpened, { open: openAddWell, close: closeAddWell }] = useDisclosure(false);
+
 
   const handleButtonClick = (content) => {
     setDrawerContent(content);
@@ -140,10 +149,38 @@ const LandfillProfile = () => {
         </div>
       );
 };
+const handleAddGasWell = async (newGasWell) => {
+
+  console.log(newGasWell)
+  try {
+    const result = await client.graphql({
+      query: createGasWells,
+      variables: { input: newGasWell }
+    });
+
+console.log("RESULT",result)
+showNotification({
+  title: 'New Gas Well Added',
+  message: `A new gas well named ${newGasWell.gasWellName} has been added.`,
+  color: 'green',
+});
+    // setGasWells((prevGasWells) => [...prevGasWells, result.data.createGasWells]);
+    closeAddWell();
+  } catch (error) {
+    console.error('Error adding gas well:', error);
+  }
+};
 
   return (
-      <div>
-      <Drawer position="right" opened={opened} onClose={close} >
+    <>
+  <Modal zIndex={1050} opened={openedModal} onClose={closeModal} title="Add Service Request">
+    <ServiceRequestWindow/>
+  </Modal>
+  <Modal opened={addWellOpened} onClose={closeAddWell} title="Add Gas Well">
+    <AddGasWell onSubmit={handleAddGasWell} landfillsID={id}/>
+  </Modal>
+  <div>
+      <Drawer size={isMobile ? "80%" : "30%"} position="right" opened={opened} onClose={close} >
       {selectedGasWell && selectedGasWell.Devices && (
           <div>
             <div key={selectedGasWell.Devices.id}>
@@ -167,7 +204,7 @@ const LandfillProfile = () => {
             </div>
             <Divider style={{ margin: '1rem 0'}}/>
             <Group justify="flex-end">
-              <Button>Add Service Request</Button>
+              <Button onClick={openModal}>Add Service Request</Button>
               <Button style={{padding: '0 0.25rem'}} variant="light">
                 <IconDots />
               </Button>
@@ -196,16 +233,20 @@ const LandfillProfile = () => {
       </Drawer>
 
         <h3 style={{padding: "0.75rem"}}>{landfill.name}</h3>
-        <div style={{position: 'absolute', top: '120px', height: isMobile ? '70%' : '90%', width: '100%'}}>
+        <div style={{position: 'absolute', top: '120px', height: '90%', width: '100%'}}>
           <GoogleMapComponent           
           openDrawer={handleButtonClick}
           handleGasWellSelect={handleGasWellSelect}
           lat={landfill.lat} 
           lng={landfill.lng} 
-          gasWells={gasWells}/>
+          landfillId={id}
+          gasWells={gasWells}
+          openAddWell={openAddWell}/>
         </div>
         
     </div>
+    </>
+      
     
   );
 

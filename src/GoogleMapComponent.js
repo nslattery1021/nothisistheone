@@ -5,9 +5,8 @@ import { Autocomplete, Menu, Modal, Divider, ActionIcon, Select, SelectProps, re
 
 import { useDisclosure } from '@mantine/hooks';
 import MarkerWithInfoWindow from './MarkerWithInfoWindow';
-import AddGasWell from './AddGasWell';
 
-const MyComponent = ({ gasWells, openDrawer, setSelectedGasWellId, handleGasWellSelect }) => {
+const MyComponent = ({ gasWells, openDrawer, setSelectedGasWellId, handleGasWellSelect, openAddWell }) => {
   const map = useMap('main-map');
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -77,9 +76,7 @@ const MyComponent = ({ gasWells, openDrawer, setSelectedGasWellId, handleGasWell
 
 
   return <>
-  <Modal opened={opened} onClose={close} title="Add Landfill">
-    <AddGasWell />
-  </Modal>
+ 
 <Menu style={menuButtonStyle}>
   <Menu.Target>
   <ActionIcon size="lg" variant="default" color="gray">
@@ -89,7 +86,7 @@ const MyComponent = ({ gasWells, openDrawer, setSelectedGasWellId, handleGasWell
   <Menu.Dropdown>
       <Menu.Label>Map Options</Menu.Label>
       
-      <Menu.Item onClick={open} leftSection={<IconPlus style={{ width: rem(14), height: rem(14) }} />}>Add Gas Well</Menu.Item>
+      <Menu.Item onClick={openAddWell} leftSection={<IconPlus style={{ width: rem(14), height: rem(14) }} />}>Add Gas Well</Menu.Item>
       <Divider />
       <Menu.Item leftSection={<IconAdjustmentsHorizontal style={{ width: rem(14), height: rem(14) }} />}>Filters</Menu.Item>
       <Menu.Item onClick={handleButtonClick('purchaseOrders')} leftSection={<IconClipboardText style={{ width: rem(14), height: rem(14) }} />}>Purchase Orders</Menu.Item>
@@ -109,7 +106,7 @@ renderOption={renderSelectOption}
 </>;
 };
 
-const GoogleMapComponent = ({ openDrawer, handleGasWellSelect, lat, lng, gasWells }) => {
+const GoogleMapComponent = ({ openDrawer, handleGasWellSelect, lat, lng, gasWells, openAddWell }) => {
     
   const [markerRef, marker] = useMarkerRef();
   const [selectedGasWellId, setSelectedGasWellId] = useState(null);
@@ -127,7 +124,7 @@ const GoogleMapComponent = ({ openDrawer, handleGasWellSelect, lat, lng, gasWell
         lat: parseFloat(lat),
         lng: parseFloat(lng)
     };
-    
+    console.log("GASWELLS",gasWells)
     return (
         <APIProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
             
@@ -153,7 +150,7 @@ const GoogleMapComponent = ({ openDrawer, handleGasWellSelect, lat, lng, gasWell
                 props={well} />
             ))}
         </Map>
-        <MyComponent gasWells={gasWells} openDrawer={openDrawer} setSelectedGasWellId={setSelectedGasWellId} handleGasWellSelect={handleGasWellSelect}/>
+        <MyComponent gasWells={gasWells} openDrawer={openDrawer} setSelectedGasWellId={setSelectedGasWellId} handleGasWellSelect={handleGasWellSelect} openAddWell={openAddWell}/>
       </APIProvider>
     );
   }

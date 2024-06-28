@@ -85,11 +85,11 @@ const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer }) => {
             </Label>
       </AdvancedMarker>
       {isSelected && (
-        <InfoWindow style={{minWidth: '300px'}} anchor={marker} onCloseClick={() => onClick(null)}>
+        <InfoWindow anchor={marker} onCloseClick={() => onClick(null)}>
         
           <div>
-          <Grid grow gutter="xs">
-            <Grid.Col span={'auto'}>
+          <div style={{display: 'flex', gap: '0.5rem'}}>
+            <div>
               <div  
                 style={{
                   height: '140px',
@@ -107,8 +107,8 @@ const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer }) => {
                     color: 'white', margin: '0'
                   }}></i>
               </div>
-            </Grid.Col>
-            <Grid.Col span={7}>
+            </div>
+            <div>
               <h3 style={{margin: '0'}}>
                 {hasDevice ? 
                     <a target={"_blank"} href={`https://console.particle.io/medora-16572/devices/${props.Devices.macAddress}`}>{props.gasWellName}</a>
@@ -128,8 +128,8 @@ const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer }) => {
               <div style={{display: 'flex', marginTop: '0.5rem', gap: '0.25rem'}}>
                 <Label><Icon name='tachometer alternate' /> 23</Label>
               </div>
-            </Grid.Col>
-          </Grid>
+            </div>
+          </div>
             
             
             <ActionIcon.Group  style={{marginTop: '1rem', width: '100%'}}>

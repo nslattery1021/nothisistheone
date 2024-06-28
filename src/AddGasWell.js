@@ -1,101 +1,91 @@
-// src/AddLandfill.js
-import React, { useState } from 'react';
-import { generateClient } from 'aws-amplify/api';
-import { createLandfills } from './graphql/mutations';
-import { Autocomplete, Button, Chip, Divider, Input, Grid, Select } from '@mantine/core';
-import AutocompleteInput from './AutocompleteInput';
-import { showNotification } from '@mantine/notifications';
+import React, { useState, useEffect } from 'react';
+import { TextInput, NumberInput, Button, Group, Box, Select } from '@mantine/core';
 
+const AddGasWellForm = ({ onSubmit, landfillsID }) => {
+  const [gasWellName, setGasWellName] = useState('');
+  const [lat, setLat] = useState('');
+  const [lng, setLng] = useState('');
+  const [type, setType] = useState('');
+  const [subtype, setSubtype] = useState('');
 
-const AddGasWell = () => {
-  const [landfill, setLandfill] = useState({
-    name: '',
-    address: '',
-    state: '',
-    city: '',
-    zip: '',
-    lat: '',
-    lng: '',
-    active: false,
-  });
-  const client = generateClient();
-  const [checked, setChecked] = useState(false);
+  const typeOptions = [
+    { value: 'Header Monitor', label: 'Header Monitor' },
+    { value: 'Smart Well', label: 'Smart Well' },
+  ];
 
-  const handleChange = (e) => {
-    console.log(e)
-    const { name, value, type, checked } = e.target;
-    setLandfill({
-      ...landfill,
-      [name]: type === 'checkbox' ? checked : value,
-    });
+  const subtypeOptions = {
+    'Header Monitor': [
+      { value: 'Above Surface', label: 'Above Surface' },
+      { value: 'Subsurface', label: 'Subsurface' },
+      { value: 'Riser', label: 'Riser' },
+    ],
+    'Smart Well': [
+      { value: '2" Well', label: '2" Well' },
+      { value: '3" Well', label: '3" Well' },
+    ],
   };
 
-  const handleSubmit = async (e) => {
+  useEffect(() => {
+    // Reset subtype when type changes
+    setSubtype('');
+  }, [type]);
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await client.graphql({
-        query: createLandfills,
-        variables: { input: landfill }
-      }
-        );
-        showNotification({
-          title: 'Success',
-          message: 'Landfill added successfully!',
-          color: 'green',
-        });
-      setLandfill({
-        name: '',
-        address: '',
-        state: '',
-        city: '',
-        zip: '',
-        country: '',
-        lat: null,
-        lng: null,
-        active: false,
-      });
-    } catch (error) {
-      console.error('Error adding landfill:', error);
-    }
+    const newGasWell = { gasWellName, lat, lng, type, subtype, landfillsID };
+    onSubmit(newGasWell);
+    // Clear the form fields
+    setGasWellName('');
+    setLat('');
+    setLng('');
+    setType('');
+    setSubtype('');
   };
-
 
   return (
-    
-    <form onSubmit={handleSubmit}>
-        <Grid>
-            <Grid.Col span={12}>
-              <Input.Wrapper label="Gas Well Name">
-                <Input name="name" placeholder="Name" value={landfill.name} onChange={handleChange} required/>
-              </Input.Wrapper>
-            </Grid.Col>
-          
-            <Grid.Col span={12}>
-              <Select
-                label="Gas Well Type"
-                placeholder="Choose gas well type"
-                data={['Smart Well', 'Header Monitor']}
-              />
-                {/* <Input name="address" placeholder="Address" value={landfill.address} onChange={handleChange} required/> */}
-            </Grid.Col>
-        
-            <Grid.Col span={12}>
-              <Select
-                label="Gas Well Subtype"
-                placeholder="Choose gas well subtype"
-                data={['2" Well', '3" Well']}
-              />
-                {/* <Input name="address" placeholder="Address" value={landfill.address} onChange={handleChange} required/> */}
-            </Grid.Col>
-
-            
-           
-            <Grid.Col position="right" span={12}>
-                <Button type="submit">Add Gas Well</Button>
-            </Grid.Col>
-        </Grid>
-    </form>
+    <Box sx={{ maxWidth: 400 }} mx="auto">
+      <form onSubmit={handleSubmit}>
+        <TextInput
+          label="Gas Well Name"
+          value={gasWellName}
+          onChange={(e) => setGasWellName(e.target.value)}
+          required
+        />
+        <NumberInput
+          label="Latitude"
+          value={lat}
+          onChange={(value) => setLat(value)}
+          required
+          precision={6}
+        />
+        <NumberInput
+          label="Longitude"
+          value={lng}
+          onChange={(value) => setLng(value)}
+          required
+          precision={6}
+        />
+        <Select
+          label="Type"
+          value={type}
+          onChange={(value) => setType(value)}
+          data={typeOptions}
+          required
+        />
+        <Select
+          label="Subtype"
+          value={subtype}
+          onChange={(value) => setSubtype(value)}
+          data={type ? subtypeOptions[type] : []}
+          disabled={!type}
+          required
+        />
+        <Group position="right" mt="md">
+          <Button type="submit">Add Gas Well</Button>
+        </Group>
+      </form>
+    </Box>
   );
 };
 
-export default AddGasWell;
+export default AddGasWellForm;
