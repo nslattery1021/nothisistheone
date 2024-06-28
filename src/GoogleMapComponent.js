@@ -130,7 +130,7 @@ const GoogleMapComponent = ({ openDrawer, handleGasWellSelect, lat, lng, gasWell
             
         <Map
         id={'main-map'}
-            style={{width: '100%', height: '90%'}}
+            style={{width: '100%', height: '100%'}}
             defaultCenter={ center }
             mapTypeId= 'satellite'
             defaultZoom={16}

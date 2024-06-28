@@ -2,8 +2,10 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/api';
 import { useDisclosure } from '@mantine/hooks';
-import { Accordion, Divider, Drawer, Button, Group, Modal, Timeline, Text } from '@mantine/core';
-import { IconDots, IconTool } from '@tabler/icons-react';
+import { Link } from "react-router-dom";
+
+import { Accordion, Divider, Button, ActionIcon, Modal, Timeline, Text } from '@mantine/core';
+import { IconMap } from '@tabler/icons-react';
 import moment from 'moment';
 
 import { getLandfills } from './graphql/queries';
@@ -65,7 +67,16 @@ const LandfillProfiles = () => {
     <div style={{backgroundColor: '#fcfcfc'}}>
     <div style={{padding: "0.75rem", fontSize: '1rem'}}>
         <h3 style={{padding: "0", fontSize: '0.75rem', margin: '0', color: 'gray'}}>LANDFILL</h3>
+        <div style={{display: 'flex', gap: '0.5rem'}}>
         <h3 style={{padding: "0", margin: '0'}}>{landfill.name}</h3>
+
+        <Link to={`/landfill/${id}`}>
+                <ActionIcon variant="transparent" aria-label="Settings">
+                    <IconMap style={{ width: '20px', height: '20px' }} stroke={1.5} />
+                </ActionIcon>
+                
+                </Link>
+        </div>
       </div>
       <div style={{padding: "0.75rem", fontSize: '1rem'}}>
         <h3 style={{padding: "0", fontSize: '0.75rem', margin: '0', color: 'gray'}}>ADDRESS</h3>

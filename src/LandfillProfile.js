@@ -233,7 +233,7 @@ showNotification({
       </Drawer>
 
         <h3 style={{padding: "0.75rem"}}>{landfill.name}</h3>
-        <div style={{position: 'absolute', top: '120px', height: '90%', width: '100%'}}>
+        <div style={{position: 'absolute', top: '110px', height: '80%', width: '100%'}}>
           <GoogleMapComponent           
           openDrawer={handleButtonClick}
           handleGasWellSelect={handleGasWellSelect}
