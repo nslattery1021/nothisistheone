@@ -1,3 +1,20 @@
+type ServiceTypes @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String
+  isActive: Boolean
+  Services: [Service] @hasMany(indexName: "byServiceTypes", fields: ["id"])
+}
+
+type Service @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  title: String
+  completedNotes: String
+  isComplete: Boolean
+  priority: String
+  devicesID: ID! @index(name: "byDevices")
+  servicetypesID: ID! @index(name: "byServiceTypes")
+}
+
 type Devices @model @auth(rules: [{allow: public}]) {
   id: ID!
   macAddress: String
@@ -9,6 +26,7 @@ type Devices @model @auth(rules: [{allow: public}]) {
   flowMeter: String
   restrictionSize: Float
   pipeSize: Float
+  Services: [Service] @hasMany(indexName: "byDevices", fields: ["id"])
 }
 
 type GasWells @model @auth(rules: [{allow: public}]) {

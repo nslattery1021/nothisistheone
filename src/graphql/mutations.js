@@ -1,6 +1,120 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createServiceTypes = /* GraphQL */ `
+  mutation CreateServiceTypes(
+    $input: CreateServiceTypesInput!
+    $condition: ModelServiceTypesConditionInput
+  ) {
+    createServiceTypes(input: $input, condition: $condition) {
+      id
+      name
+      isActive
+      Services {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateServiceTypes = /* GraphQL */ `
+  mutation UpdateServiceTypes(
+    $input: UpdateServiceTypesInput!
+    $condition: ModelServiceTypesConditionInput
+  ) {
+    updateServiceTypes(input: $input, condition: $condition) {
+      id
+      name
+      isActive
+      Services {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteServiceTypes = /* GraphQL */ `
+  mutation DeleteServiceTypes(
+    $input: DeleteServiceTypesInput!
+    $condition: ModelServiceTypesConditionInput
+  ) {
+    deleteServiceTypes(input: $input, condition: $condition) {
+      id
+      name
+      isActive
+      Services {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const createService = /* GraphQL */ `
+  mutation CreateService(
+    $input: CreateServiceInput!
+    $condition: ModelServiceConditionInput
+  ) {
+    createService(input: $input, condition: $condition) {
+      id
+      title
+      completedNotes
+      isComplete
+      priority
+      devicesID
+      servicetypesID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateService = /* GraphQL */ `
+  mutation UpdateService(
+    $input: UpdateServiceInput!
+    $condition: ModelServiceConditionInput
+  ) {
+    updateService(input: $input, condition: $condition) {
+      id
+      title
+      completedNotes
+      isComplete
+      priority
+      devicesID
+      servicetypesID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteService = /* GraphQL */ `
+  mutation DeleteService(
+    $input: DeleteServiceInput!
+    $condition: ModelServiceConditionInput
+  ) {
+    deleteService(input: $input, condition: $condition) {
+      id
+      title
+      completedNotes
+      isComplete
+      priority
+      devicesID
+      servicetypesID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const createDevices = /* GraphQL */ `
   mutation CreateDevices(
     $input: CreateDevicesInput!
@@ -17,6 +131,10 @@ export const createDevices = /* GraphQL */ `
       flowMeter
       restrictionSize
       pipeSize
+      Services {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -39,6 +157,10 @@ export const updateDevices = /* GraphQL */ `
       flowMeter
       restrictionSize
       pipeSize
+      Services {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -61,6 +183,10 @@ export const deleteDevices = /* GraphQL */ `
       flowMeter
       restrictionSize
       pipeSize
+      Services {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       __typename

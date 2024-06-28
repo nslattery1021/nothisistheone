@@ -6,4 +6,6 @@
 
 export { default as LandfillsCreateForm } from "./LandfillsCreateForm";
 export { default as LandfillsUpdateForm } from "./LandfillsUpdateForm";
+export { default as ServiceTypesCreateForm } from "./ServiceTypesCreateForm";
+export { default as ServiceTypesUpdateForm } from "./ServiceTypesUpdateForm";
 export { default as studioTheme } from "./studioTheme";

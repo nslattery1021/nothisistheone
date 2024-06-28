@@ -1,6 +1,146 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getServiceTypes = /* GraphQL */ `
+  query GetServiceTypes($id: ID!) {
+    getServiceTypes(id: $id) {
+      id
+      name
+      isActive
+      Services {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listServiceTypes = /* GraphQL */ `
+  query ListServiceTypes(
+    $filter: ModelServiceTypesFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listServiceTypes(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        name
+        isActive
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getService = /* GraphQL */ `
+  query GetService($id: ID!) {
+    getService(id: $id) {
+      id
+      title
+      completedNotes
+      isComplete
+      priority
+      devicesID
+      servicetypesID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listServices = /* GraphQL */ `
+  query ListServices(
+    $filter: ModelServiceFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listServices(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        title
+        completedNotes
+        isComplete
+        priority
+        devicesID
+        servicetypesID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const servicesByDevicesID = /* GraphQL */ `
+  query ServicesByDevicesID(
+    $devicesID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelServiceFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    servicesByDevicesID(
+      devicesID: $devicesID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        title
+        completedNotes
+        isComplete
+        priority
+        devicesID
+        servicetypesID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const servicesByServicetypesID = /* GraphQL */ `
+  query ServicesByServicetypesID(
+    $servicetypesID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelServiceFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    servicesByServicetypesID(
+      servicetypesID: $servicetypesID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        title
+        completedNotes
+        isComplete
+        priority
+        devicesID
+        servicetypesID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getDevices = /* GraphQL */ `
   query GetDevices($id: ID!) {
     getDevices(id: $id) {
@@ -14,6 +154,10 @@ export const getDevices = /* GraphQL */ `
       flowMeter
       restrictionSize
       pipeSize
+      Services {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -162,6 +306,33 @@ export const gasWellsByLandfillsID = /* GraphQL */ `
         type
         subtype
         landfillsID
+        Devices {
+          deviceName
+          serialNum
+          macAddress
+          deviceType
+          flowMeter
+          id
+          iccid
+          landfillsID
+          updatedAt
+          restrictionSize
+          pipeSize
+          createdAt
+          Services {
+            items {
+              title
+              completedNotes
+              createdAt
+              devicesID
+              id
+              isComplete
+              priority
+              updatedAt
+              servicetypesID
+            }
+          }
+        }
         createdAt
         updatedAt
         gasWellsDevicesId
