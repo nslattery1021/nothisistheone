@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/api';
 import { useDisclosure } from '@mantine/hooks';
-import { Accordion, Divider, Drawer, Button, Group, Modal, Timeline, Text } from '@mantine/core';
+import { ActionIcon, Accordion, Divider, Drawer, Button, Group, Modal, Timeline, Text, Loader, Center } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { IconDots, IconTool } from '@tabler/icons-react';
+import { IconDots, IconTool, IconListDetails } from '@tabler/icons-react';
 import moment from 'moment';
 
 import { getLandfills, getGasWells, gasWellsByLandfillsID } from './graphql/queries';
@@ -15,7 +15,7 @@ import AddGasWell from './AddGasWell';
 import GoogleMapComponent from './GoogleMapComponent'; // Ensure correct import path
 import ServiceRequestWindow from './ServiceRequestWindow'; // Ensure correct import path
 
-const LandfillProfile = () => {
+const LandfillMap = () => {
   const { id } = useParams();
   const [landfill, setLandfill] = useState(null);
   const [gasWells, setGasWells] = useState([]);
@@ -119,7 +119,7 @@ const LandfillProfile = () => {
   };
 
   if (!landfill) {
-    return <div>Loading...</div>;
+    return <Center style={{padding: '1rem', }}><Loader color="blue" /></Center>;
   }
 
   const ServiceList = ({ selectedGasWell, isComplete }) => {
@@ -232,7 +232,16 @@ showNotification({
         )}
       </Drawer>
 
-        <h3 style={{padding: "0.75rem"}}>{landfill.name}</h3>
+      <div style={{padding: "1rem", display: 'flex', gap: '0.5rem', alignItems: 'center'}}>
+        <h3 style={{margin: '0'}}>{landfill.name}</h3>
+
+        <Link to={`/profile/${id}`}>
+                <ActionIcon variant="transparent" aria-label="Settings">
+                    <IconListDetails style={{ width: '1.2rem', height: '1.2rem' }} stroke={1.5} />
+                </ActionIcon>
+                
+                </Link>
+        </div>
         <div style={{position: 'absolute', top: '110px', height: '80%', width: '100%'}}>
           <GoogleMapComponent           
           openDrawer={handleButtonClick}
@@ -252,4 +261,4 @@ showNotification({
 
 };
 
-export default LandfillProfile;
+export default LandfillMap;

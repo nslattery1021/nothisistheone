@@ -10,7 +10,7 @@ import { IconBuildingFactory, IconCalendarMonth, IconFileDescription, IconPackag
 import Home from './Home'; // Ensure correct import path
 import Inventory from './Inventory'; // Ensure correct import path
 import LandfillMapList from './LandfillMapList'; // Ensure correct import path
-import LandfillProfile from './LandfillProfile'; // Ensure correct import path
+import LandfillMap from './LandfillMap'; // Ensure correct import path
 import LandfillProfiles from './LandfillProfiles'; // Ensure correct import path
 import Settings from './Settings'; // Ensure correct import path
 import ExampleComponent from './ExampleComponent'; // Ensure correct import path
@@ -31,7 +31,7 @@ const App = () => {
         <Route path="/settings" element={<Settings />} />
         <Route path="/example" element={<ExampleComponent />} />
         <Route path="/inventory" element={<Inventory />} />
-        <Route path="/landfill/:id" element={<LandfillProfile />} />
+        <Route path="/landfill/:id" element={<LandfillMap />} />
         <Route path="/profile/:id" element={<LandfillProfiles />} />
 
         {/* Using path="*"" means "match anything", so this route
@@ -48,29 +48,7 @@ function Layout() {
   const { tabValue } = useParams();
   return (
     <div>
-      {/* <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/landfills">Landfills</Link>
-          </li>
-          
-          <li>
-            <Link to="/dispatch">Dispatch</Link>
-          </li>
-          <li>
-            <Link to="/reports">Reports</Link>
-          </li>
-          <li>
-            <Link to="/inventory">Inventory</Link>
-          </li>
-          <li>
-            <Link to="/settings">Settings</Link>
-          </li>
-        </ul>
-      </nav> */}
+   
 <Tabs
       value={tabValue}
       onChange={(value) => navigate(`/${value}`)}

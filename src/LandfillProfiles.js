@@ -1,15 +1,15 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/api';
 import { useDisclosure } from '@mantine/hooks';
-import { Link } from "react-router-dom";
-
-import { Accordion, Divider, Button, ActionIcon, Modal, Timeline, Text } from '@mantine/core';
-import { IconMap } from '@tabler/icons-react';
+import {
+  Accordion, Divider, Group, Button, Drawer, Flex, ActionIcon, Menu, Center, Loader, rem,
+} from '@mantine/core';
+import {
+  IconMap, IconPhone, IconCalendarEvent, IconDots, IconMenu2, IconAdjustments, IconInfoCircleFilled, IconCpu,
+} from '@tabler/icons-react';
 import moment from 'moment';
-
 import { getLandfills } from './graphql/queries';
-
 import AddGasWell from './AddGasWell';
 import ServiceRequestWindow from './ServiceRequestWindow'; // Ensure correct import path
 
@@ -22,27 +22,25 @@ const LandfillProfiles = () => {
   const [drawerContent, setDrawerContent] = useState('');
   const [selectedGasWell, setSelectedGasWell] = useState(null);
   const [addWellOpened, { open: openAddWell, close: closeAddWell }] = useDisclosure(false);
+  const [activeContent, setActiveContent] = useState('general');
 
   const isMobile = window.innerWidth <= 768;
   const client = generateClient();
-  
+
   useEffect(() => {
     const fetchLandfill = async () => {
       try {
         const landfillData = await client.graphql({
-            query: getLandfills,
-            variables: { id: id }
+          query: getLandfills,
+          variables: { id },
         });
-        // document.title = landfill.name;
         setLandfill(landfillData.data.getLandfills);
-
       } catch (error) {
         console.error('Error fetching gaswells:', error);
       }
     };
 
     fetchLandfill();
-
   }, [id]);
 
   const handleGasWellSelect = (gasWellId) => {
@@ -50,70 +48,162 @@ const LandfillProfiles = () => {
   };
 
   if (!landfill) {
-    return <div>Loading...</div>;
+    return <Center style={{ padding: '1rem' }}><Loader color="blue" /></Center>;
   }
 
-  const googleMapsLink = (landfill.address+" "+landfill.city+" "+landfill.state+" "+landfill.zip).replaceAll(" ","%20");
+  const googleMapsLink = `${landfill.address} ${landfill.city} ${landfill.state} ${landfill.zip}`.replaceAll(' ', '%20');
+  const iconStyle = { width: rem(20), height: rem(20) };
+  const menuItems = [
+    { value: 'general', label: 'General', icon: <IconInfoCircleFilled style={iconStyle} stroke={1.1} /> },
+    { value: 'devices', label: 'Devices', icon: <IconCpu style={iconStyle} stroke={1.1} /> },
+  ];
+
+  const renderContent = () => {
+    switch (activeContent) {
+      case 'general':
+        return (
+          <div style={{ padding: '0.75rem' }}>
+            <Accordion
+              multiple
+              defaultValue="notes"
+              onChange={setOpenAccordion}
+              styles={{
+                item: { borderBottom: '0' },
+                label: {
+                  color: '#333',
+                  fontWeight: '550',
+                  fontSize: '1rem',
+                },
+              }}
+            >
+              <Accordion.Item value="notes">
+                <Accordion.Control>Notes</Accordion.Control>
+                <Accordion.Panel>No notes yet.</Accordion.Panel>
+              </Accordion.Item>
+              <Accordion.Item value="contacts">
+                <Accordion.Control>Contacts</Accordion.Control>
+                <Accordion.Panel>No contacts yet.</Accordion.Panel>
+              </Accordion.Item>
+              <Accordion.Item value="jobs">
+                <Accordion.Control>Jobs</Accordion.Control>
+                <Accordion.Panel>No jobs yet.</Accordion.Panel>
+              </Accordion.Item>
+            </Accordion>
+          </div>
+        );
+      case 'devices':
+        return (
+          <div style={{ padding: '0.75rem' }}>
+            <h5>Devices</h5>
+          </div>
+        );
+      default:
+        return <div style={{ padding: '0.75rem' }}>Select an option from the menu.</div>;
+    }
+  };
 
   return (
     <>
-  {/* <Modal zIndex={1050} opened={openedModal} onClose={closeModal} title="Add Service Request">
-    <ServiceRequestWindow/>
-  </Modal>
-  <Modal opened={addWellOpened} onClose={closeAddWell} title="Add Gas Well">
-    <AddGasWell onSubmit={handleAddGasWell} landfillsID={id}/>
-  </Modal> */}
-  <div>
-    <div style={{backgroundColor: '#fcfcfc'}}>
-    <div style={{padding: "0.75rem", fontSize: '1rem'}}>
-        <h3 style={{padding: "0", fontSize: '0.75rem', margin: '0', color: 'gray'}}>LANDFILL</h3>
-        <div style={{display: 'flex', gap: '0.5rem'}}>
-        <h3 style={{padding: "0", margin: '0'}}>{landfill.name}</h3>
-
-        <Link to={`/landfill/${id}`}>
-                <ActionIcon variant="transparent" aria-label="Settings">
-                    <IconMap style={{ width: '20px', height: '20px' }} stroke={1.5} />
-                </ActionIcon>
-                
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <div style={{ backgroundColor: '#fcfcfc', padding: '1rem 0.75rem'}}>
+          <Flex
+            style={{ fontSize: '1rem' }}
+            gap="xs"
+            justify="space-between"
+            align="center"
+            direction="row"
+            wrap="nowrap"
+          >
+            <div>
+              <h3 style={{
+                padding: '0', fontSize: '0.75rem', margin: '0', color: 'gray',
+              }}
+              >
+                LANDFILL
+              </h3>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <h3 style={{ padding: '0', margin: '0' }}>{landfill.name}</h3>
+                <Link to={`/landfill/${id}`}>
+                  <ActionIcon variant="transparent" aria-label="Settings">
+                    <IconMap style={{ width: '1.2rem', height: '1.2rem' }} stroke={1.5} />
+                  </ActionIcon>
                 </Link>
+              </div>
+            </div>
+            <Menu shadow="md" width={200}>
+              <Menu.Target>
+                <ActionIcon>
+                  <IconDots style={{ width: '1.2rem', height: '1.2rem' }} stroke={1.5} />
+                </ActionIcon>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Label>Landfill Options</Menu.Label>
+                <Menu.Item leftSection={<IconPhone style={{ width: rem(14), height: rem(14) }} />}>
+                  Add Contact
+                </Menu.Item>
+                <Menu.Item leftSection={<IconCalendarEvent style={{ width: rem(14), height: rem(14) }} />}>
+                  Add Job
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          </Flex>
+          <div style={{ paddingTop: '0.75rem', fontSize: '1rem' }}>
+            <h3 style={{
+              padding: '0', fontSize: '0.75rem', margin: '0', color: 'gray',
+            }}
+            >
+              ADDRESS
+            </h3>
+            <a target="_blank" href={`http://maps.google.com/?q=${googleMapsLink}`}>
+              <h3 style={{
+                padding: '0', margin: '0', fontSize: '0.95rem', fontWeight: '500',
+              }}
+              >
+                {landfill.address}, {landfill.city} {landfill.state} {landfill.zip}
+              </h3>
+            </a>
+          </div>
+        </div>
+        <Divider />
+        <div style={{ display: 'flex', flexGrow: 1 }}>
+          <Flex
+            direction="column"
+            spacing="xs"
+            style={{
+              backgroundColor: '#f0f0f0',
+              height: '100%',
+              width: '50px', // Adjust width as needed
+            //   padding: '1rem',
+            }}
+          >
+            {menuItems.map((item) => (
+              <Button
+                key={item.value}
+                variant="subtle"
+                onClick={() => setActiveContent(item.value)}
+                fullWidth
+                style={{
+                  justifyContent: 'flex-start',
+                  color: activeContent === item.value ? '#fff' : '#555',
+                  fontWeight: activeContent === item.value ? 'bold' : 'normal',
+                  backgroundColor: activeContent === item.value ? 'rgba(156, 156, 156, 1)' : 'transparent',
+                  marginBottom: '0.5rem',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                  {item.icon}
+                  {/* <span style={{ marginLeft: '1rem' }}>{item.label}</span> */}
+                </div>
+              </Button>
+            ))}
+          </Flex>
+          <div style={{ flexGrow: 1 }}>
+            {renderContent()}
+          </div>
         </div>
       </div>
-      <div style={{padding: "0.75rem", fontSize: '1rem'}}>
-        <h3 style={{padding: "0", fontSize: '0.75rem', margin: '0', color: 'gray'}}>ADDRESS</h3>
-        
-        <a target="_blank" href={`http://maps.google.com/?q=${googleMapsLink}`}><h3 style={{padding: "0", margin: '0', fontSize: '0.95rem', fontWeight: '500'}}>{landfill.address}, {landfill.city} {landfill.state} {landfill.zip}</h3></a>
-      </div>
-
-    </div>
-      
-      <Divider style={{margin: "0 0 1rem 0"}}/>
-        <Accordion multiple defaultValue="contacts" onChange={setOpenAccordion} styles={{
-                    item: {
-borderBottom: '0'
-                    },
-                    label: {
-                      color: '#333', // Text color
-                      fontWeight: '550',
-                      fontSize: '1rem'
-                    }}}>
-                <Accordion.Item value={"contacts"}>
-                  <Accordion.Control>Contacts</Accordion.Control>
-                  <Accordion.Panel>
-                  </Accordion.Panel>
-                </Accordion.Item>
-                <Accordion.Item value={"jobs"}>
-                  <Accordion.Control>Jobs</Accordion.Control>
-                  <Accordion.Panel>
-
-                  </Accordion.Panel>
-                </Accordion.Item>
-              </Accordion>
-    </div>
     </>
-      
-    
   );
-
 };
 
 export default LandfillProfiles;

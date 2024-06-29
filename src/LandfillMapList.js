@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { generateClient } from 'aws-amplify/api';
 import { listLandfills } from './graphql/queries';
 import { deleteLandfills } from './graphql/mutations';
-import LandfillProfile from './LandfillProfile'; // Adjust the path according to your project structure
 import { Link } from "react-router-dom";
 import { IconMap, IconListDetails } from '@tabler/icons-react';
 import { onCreateLandfills, onUpdateLandfills, onDeleteLandfills } from './graphql/subscriptions';
