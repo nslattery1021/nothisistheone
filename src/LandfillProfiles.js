@@ -3,19 +3,22 @@ import { useParams, Link } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/api';
 import { useDisclosure } from '@mantine/hooks';
 import {
-  Accordion, Divider, Group, Button, Drawer, Flex, ActionIcon, Menu, Center, Loader, rem,
+  Accordion, Divider, Group, Button, Table, Flex, ActionIcon, Menu, Center, Loader, rem,
 } from '@mantine/core';
 import {
   IconMap, IconPhone, IconCalendarEvent, IconDots, IconMenu2, IconAdjustments, IconInfoCircleFilled, IconCpu,
 } from '@tabler/icons-react';
 import moment from 'moment';
-import { getLandfills } from './graphql/queries';
+import { getLandfills, devicesByLandfillsID } from './graphql/queries';
 import AddGasWell from './AddGasWell';
 import ServiceRequestWindow from './ServiceRequestWindow'; // Ensure correct import path
+
+import Spreadsheet from "react-spreadsheet";
 
 const LandfillProfiles = () => {
   const { id } = useParams();
   const [landfill, setLandfill] = useState(null);
+  const [allDevices, setAllDevices] = useState(null);
   const [opened, { open, close }] = useDisclosure(false);
   const [openedModal, { open: openModal, close: closeModal }] = useDisclosure(false);
   const [openAccordion, setOpenAccordion] = useState([]);
@@ -27,6 +30,16 @@ const LandfillProfiles = () => {
   const isMobile = window.innerWidth <= 768;
   const client = generateClient();
 
+  const columnLabels = ["Device Name", "Device Type", "Serial Number", "Mac Address", "ICCID"];
+  const rowLabels = [];
+  const data = allDevices?.items.map(device => ([
+    { value: device.deviceName },
+    { value: device.deviceType },
+    { value: device.serialNum },
+    { value: device.macAddress },
+    { value: device.iccid },
+  ]));
+
   useEffect(() => {
     const fetchLandfill = async () => {
       try {
@@ -35,20 +48,28 @@ const LandfillProfiles = () => {
           variables: { id },
         });
         setLandfill(landfillData.data.getLandfills);
+
+        const deviceData = await client.graphql({
+          query: devicesByLandfillsID,
+          variables: { landfillsID: id },
+        });
+
+
+
+        setAllDevices(deviceData.data.devicesByLandfillsID);
       } catch (error) {
-        console.error('Error fetching gaswells:', error);
+        console.error('Error fetching dec:', error);
       }
     };
-
     fetchLandfill();
   }, [id]);
-
-  const handleGasWellSelect = (gasWellId) => {
-    setSelectedGasWell(gasWellId);
+const spreadsheetStyles = {
+    rowLabels: {
+      display: 'none', // Hide row labels
+    },
   };
-
-  if (!landfill) {
-    return <Center style={{ padding: '1rem' }}><Loader color="blue" /></Center>;
+  if (!allDevices) {
+    return <div>Loading devices...</div>;
   }
 
   const googleMapsLink = `${landfill.address} ${landfill.city} ${landfill.state} ${landfill.zip}`.replaceAll(' ', '%20');
@@ -59,6 +80,7 @@ const LandfillProfiles = () => {
   ];
 
   const renderContent = () => {
+    
     switch (activeContent) {
       case 'general':
         return (
@@ -93,8 +115,25 @@ const LandfillProfiles = () => {
         );
       case 'devices':
         return (
-          <div style={{ padding: '0.75rem' }}>
+          <div style={{ padding: '0.75rem', width: '100%' }}>
             <h5>Devices</h5>
+
+            {allDevices ? 
+            (
+              <div style={{ overflowX: 'auto', padding: '1rem 0' }}>
+                <Spreadsheet
+                  data={data}
+                  columnLabels={columnLabels}
+                  hideRowIndicators={true}
+                />
+            </div>
+              
+            ) : (
+              <div>No devices found.</div>
+            )
+
+            }
+
           </div>
         );
       default:
@@ -144,10 +183,13 @@ const LandfillProfiles = () => {
                 <Menu.Item leftSection={<IconCalendarEvent style={{ width: rem(14), height: rem(14) }} />}>
                   Add Job
                 </Menu.Item>
+                <Menu.Item leftSection={<IconCpu style={{ width: rem(14), height: rem(14) }} />}>
+                  Add Devices
+                </Menu.Item>
               </Menu.Dropdown>
             </Menu>
           </Flex>
-          <div style={{ paddingTop: '0.75rem', fontSize: '1rem' }}>
+          <div style={{ paddingTop: '1rem', fontSize: '1rem' }}>
             <h3 style={{
               padding: '0', fontSize: '0.75rem', margin: '0', color: 'gray',
             }}
@@ -172,7 +214,7 @@ const LandfillProfiles = () => {
             style={{
               backgroundColor: '#f0f0f0',
               height: '100%',
-              width: '50px', // Adjust width as needed
+              width: isMobile ? '50px' : '130px', // Adjust width as needed
             //   padding: '1rem',
             }}
           >
@@ -192,12 +234,14 @@ const LandfillProfiles = () => {
               >
                 <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                   {item.icon}
-                  {/* <span style={{ marginLeft: '1rem' }}>{item.label}</span> */}
+                  {!isMobile && 
+                  <span style={{ marginLeft: '1rem' }}>{item.label}</span>
+                  }
                 </div>
               </Button>
             ))}
           </Flex>
-          <div style={{ flexGrow: 1 }}>
+          <div style={{ flexGrow: 1, overflow: 'hidden'}}>
             {renderContent()}
           </div>
         </div>
