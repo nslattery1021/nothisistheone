@@ -3,8 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/api';
 import { useDisclosure } from '@mantine/hooks';
 import { ActionIcon, Accordion, Divider, Drawer, Button, Group, Modal, Timeline, Text, Loader, Center } from '@mantine/core';
-import { showNotification } from '@mantine/notifications';
-import { IconDots, IconTool, IconListDetails } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
+import { IconDots, IconTool, IconListDetails, IconX, IconCheck } from '@tabler/icons-react';
 import moment from 'moment';
 
 import { getLandfills, getGasWells, gasWellsByLandfillsID } from './graphql/queries';
@@ -76,7 +76,6 @@ const LandfillMap = () => {
       }
     });
     
-    /* update a todo */
     const updateSub = client.graphql({
       query: onUpdateGasWells
     }).subscribe({
@@ -92,7 +91,6 @@ const LandfillMap = () => {
       }
     });
     
-    /* delete a todo */
     const deleteSub = client.graphql({
       query: onDeleteGasWells
     }).subscribe({
@@ -159,10 +157,15 @@ const handleAddGasWell = async (newGasWell) => {
     });
 
 console.log("RESULT",result)
-showNotification({
-  title: 'New Gas Well Added',
-  message: `A new gas well named ${newGasWell.gasWellName} has been added.`,
-  color: 'green',
+
+notifications.show({
+  id: 'success-adding-gas-wells',
+  withCloseButton: true,
+  autoClose: 5000,
+  title: 'New Gas Well Added!',
+  message: `${newGasWell.gasWellName} has been added.`,
+  icon: <IconCheck />,
+  color: 'green'
 });
     // setGasWells((prevGasWells) => [...prevGasWells, result.data.createGasWells]);
     closeAddWell();

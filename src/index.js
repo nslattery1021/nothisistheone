@@ -6,8 +6,10 @@ import reportWebVitals from './reportWebVitals';
 import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css'; // Import Mantine core styles
 import 'semantic-ui-css/semantic.min.css';
+import '@mantine/notifications/styles.css';
 
 import { BrowserRouter } from "react-router-dom";
+import { Notifications } from '@mantine/notifications';
 
 import { Amplify } from 'aws-amplify';
 import config from './amplifyconfiguration.json';
@@ -16,10 +18,11 @@ Amplify.configure(config);
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <MantineProvider>
-        <BrowserRouter>
-      <App />
-    </BrowserRouter>
-      
+            <Notifications />
+
+              <BrowserRouter>
+          <App />
+      </BrowserRouter>
     </MantineProvider>
 );
 
