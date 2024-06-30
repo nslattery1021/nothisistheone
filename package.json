@@ -13,6 +13,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@vis.gl/react-google-maps": "^1.1.0",
+    "ag-grid-react": "^31.3.2",
     "aws-amplify": "^6.3.7",
     "dotenv": "^16.4.5",
     "moment": "^2.30.1",

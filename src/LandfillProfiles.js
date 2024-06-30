@@ -14,8 +14,9 @@ import { getLandfills, devicesByLandfillsID } from './graphql/queries';
 import AddDevices from './AddDevices';
 import ServiceRequestWindow from './ServiceRequestWindow'; // Ensure correct import path
 import { onCreateDevices, onUpdateDevices, onDeleteDevices } from './graphql/subscriptions';
-
-import Spreadsheet from "react-spreadsheet";
+import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
+import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
+import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
 
 const LandfillProfiles = () => {
   const { id } = useParams();
@@ -28,12 +29,38 @@ const LandfillProfiles = () => {
   const [selectedGasWell, setSelectedGasWell] = useState(null);
   const [addWellOpened, { open: openAddWell, close: closeAddWell }] = useDisclosure(false);
   const [activeContent, setActiveContent] = useState('general');
+  const [rowData, setRowData] = useState([]);
+  
+  // Column Definitions: Defines the columns to be displayed.
+  const columnDefs = [
+    { headerName: "Device Name", field: "deviceName", editable: true },
+    { 
+      headerName: "Device Type", 
+      field: "deviceType", 
+      editable: true, 
+      cellEditor: 'agRichSelectCellEditor',
+      cellEditorParams: {
+        values: ['Header Monitor', 'Smart Well']
+      },
+      cellRenderer: (params) => params.value
+    },
+    { headerName: "Serial Number", field: "serialNum", editable: true },
+    { headerName: "Mac Address", field: "macAddress", editable: true },
+    { headerName: "ICCID", field: "iccid", editable: true },
+  ];
+
+  const defaultColDef = {
+    flex: 1,
+    minWidth: 100,
+    editable: true,
+    resizable: true,
+  };
 
   const isMobile = window.innerWidth <= 768;
   const client = generateClient();
 
   const columnLabels = ["Device Name", "Device Type", "Serial Number", "Mac Address", "ICCID"];
-  const [data, setData] = useState([]);
+  const [, setData] = useState([]);
 
   useEffect(() => {
     const fetchLandfill = async () => {
@@ -146,116 +173,14 @@ const LandfillProfiles = () => {
     };
   }, [id]);
 
+  const handleCellValueChange = useCallback((event) => {
+    const updatedDevice = { ...event.data };
 
-  const handleSpreadsheetChange = (changes) => {
-
-console.log("Changes",changes)
-
-    // const newData = data.map((row, rowIndex) => {
-
-    //   console.log("Changes Row",row, rowIndex)
-
-
-    //   return row.map((cell, colIndex) => {
-    //     const change = changes.find(change => change.row === rowIndex && change.col === colIndex);
-    //     console.log(change)
-    //   //   if (change) {
-    //   //     console.log("The Change",change)
-    //   //     return { value: change.value };
-    //   //   } else {
-    //   //     return cell;
-    //   //   }
-
-    //   return;
-    //   });
-    // });
-    setData(changes);
-
-
-    // updateDatabase(newData); // Implement this function to update your database
-  };
-
-const handleCellsChange = (changes) => {
-
-  console.log("changes",changes)
-  console.log("data",data)
-if(data){
-  changes.forEach((eachRow, rowIndex) => {
-
-    const dataRow = data?.[rowIndex];
-  
-    eachRow.forEach((eachCell, cellIndex) => {
-      const dataCell = dataRow?.[cellIndex];
-      const dataCellValue = dataCell?.value ?? '';
-      const eachCellValue = eachCell.value ?? '';
-  
-  
-      if(dataCellValue != eachCellValue){
-        console.log("Found change!")
-        console.log(`Row ${rowIndex}, Cell ${cellIndex}`)
-        console.log(eachCellValue)
-        console.log(dataCellValue)
-      }
-      
-    
-    });
-  });
-}
-
-// setData(changes);
-
-  // setData(prevData => {
-  //   const newData = [...prevData];
-  //   console.log('newData',newData);
-  //   console.log('changes',changes);
-  //   changes.forEach(({ cell, row, value }) => {
-
-  //     if (!newData[row]) {
-  //       newData[row] = [];
-  //     }
-  //     if (!newData[row][cell]) {
-  //       newData[row][cell] = { value: '' };
-  //     }
-  //     newData[row][cell].value = value;
-
-  //     // Update the corresponding device in the database
-  //     const updatedDevice = allDevices[row];
-  //     switch (cell) {
-  //       case 0:
-  //         updatedDevice.deviceName = value;
-  //         break;
-  //       case 1:
-  //         updatedDevice.deviceType = value;
-  //         break;
-  //       case 2:
-  //         updatedDevice.serialNum = value;
-  //         break;
-  //       case 3:
-  //         updatedDevice.macAddress = value;
-  //         break;
-  //       case 4:
-  //         updatedDevice.iccid = value;
-  //         break;
-  //       default:
-  //         break;
-  //     }
-  //     console.log('updatedDevice',updatedDevice)
-
-  //     // Update the device in the database
-  //     // const updateDeviceInDB = async () => {
-  //     //   try {
-  //     //     await API.graphql(graphqlOperation(updateDevice, { input: updatedDevice }));
-  //     //   } catch (error) {
-  //     //     console.error('Error updating device:', error);
-  //     //   }
-  //     // };
-
-  //     // updateDeviceInDB();
-  //   });
-
-  //   return newData;
-  // });
-};
+    console.log(updatedDevice)
+    // API.graphql(graphqlOperation(updateDevice, { input: updatedDevice }))
+    //   .then(() => notifications.show({ message: 'Device updated successfully', color: 'green' }))
+    //   .catch(error => notifications.show({ message: `Error updating device: ${error.message}`, color: 'red' }));
+  }, []);
 
   if (!allDevices) {
     return <Center style={{padding: '1rem', }}><Loader color="blue" /></Center>;
@@ -273,7 +198,7 @@ if(data){
     switch (activeContent) {
       case 'general':
         return (
-          <div style={{ padding: '0.75rem' }}>
+          <div style={{ padding: '0.75rem', overflowY: 'auto' }}>
             <Accordion
               multiple
               defaultValue="notes"
@@ -305,17 +230,24 @@ if(data){
         );
       case 'devices':
         return (
-          <div style={{ padding: '0.75rem', width: '100%' }}>
+          <div style={{ padding: '0.75rem', width: '100%', overflowY: 'auto' }}>
             <h5>Devices</h5>
             {allDevices ? 
             (
               <div style={{ overflowX: 'auto', padding: '1rem 0' }}>
-                <Spreadsheet
-                  data={data}
-                  columnLabels={columnLabels}
-                  hideRowIndicators={true}
-                  onEvaluatedDataChange={handleCellsChange}
-                />
+                <div
+                  className="ag-theme-quartz" // applying the grid theme
+                  style={{height: '65vh'}}
+                >
+                  <AgGridReact
+                      rowData={allDevices}
+                      columnDefs={columnDefs}
+
+                      onCellValueChanged={handleCellValueChange}
+                defaultColDef={defaultColDef}
+
+                  />
+                </div>
             </div>
               
             ) : (
