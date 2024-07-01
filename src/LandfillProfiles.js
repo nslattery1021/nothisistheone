@@ -37,29 +37,41 @@ const LandfillProfiles = () => {
   const [addWellOpened, { open: openAddWell, close: closeAddWell }] = useDisclosure(false);
   const [activeContent, setActiveContent] = useState('general');
   const [rowData, setRowData] = useState([]);
+  const [prevValue, setPrevValue] = useState('');
+
+  const setOriginalValue = (value, id, property) => {
+
+    setPrevValue(value);
+
+  }
 
   const handleUpdate = (value, id, property) => {
 
     console.log(value, id, property)
+    console.log("Prev Value", prevValue)
+    setData((state) => {
+      const nodeIndex = state.nodes.findIndex((node) => node.id === id);
+      if (nodeIndex === -1 || state.nodes[nodeIndex][property] === value) {
+        return state; // No changes needed
+      }
     
-    setData((state) => ({
-      ...state,
-      nodes: state.nodes.map((node) => {
-        if (node.id === id) {
-          return { ...node, [property]: value };
-        } else {
-          return node;
-        }
-      }),
-    }));
+      const updatedNodes = [...state.nodes];
+      updatedNodes[nodeIndex] = {
+        ...updatedNodes[nodeIndex],
+        [property]: value,
+      };
+    
+      return { ...state, nodes: updatedNodes };
+    });
   };
 
   const handleUpdateToDatabase = async (value, id, property) => {
-
-    console.log(value, id, property)
     
     const foundData = data.nodes.find(dev => dev.id == id);
-    console.log(foundData)
+
+    if(foundData[property] == prevValue){
+      return;
+    }
 
     try {
       await client.graphql({
@@ -100,6 +112,8 @@ const LandfillProfiles = () => {
               value={item.deviceName}
               onChange={(event) => handleUpdate(event.target.value, item.id, 'deviceName')}
               onBlur={(event) => handleUpdateToDatabase(event, item.id, 'deviceName')}
+              onFocus={(event) => setOriginalValue(event.target.value, item.id, 'deviceName')}
+
             />
           ),
         },
@@ -113,6 +127,8 @@ const LandfillProfiles = () => {
               value={item.deviceType}
               data={deviceTypeOptions}
               onChange={(event) => handleUpdate(event, item.id, 'deviceType')}
+              onFocus={(event) => setOriginalValue(event.target.value, item.id, 'deviceType')}
+
             >
             </Select>
           ),
@@ -128,6 +144,7 @@ const LandfillProfiles = () => {
               value={item.serialNum}
               onChange={(event) => handleUpdate(event.target.value, item.id, 'serialNum')}
               onBlur={(event) => handleUpdateToDatabase(event.target.value, item.id, 'serialNum')}
+              onFocus={(event) => setOriginalValue(event.target.value, item.id, 'serialNum')}
             />
           ),
         },
@@ -142,6 +159,8 @@ const LandfillProfiles = () => {
               value={item.macAddress}
               onChange={(event) => handleUpdate(event.target.value, item.id, 'macAddress')}
               onBlur={(event) => handleUpdateToDatabase(event.target.value, item.id, 'macAddress')}
+              onFocus={(event) => setOriginalValue(event.target.value, item.id, 'macAddress')}
+
             />
           ),
         },
@@ -156,6 +175,8 @@ const LandfillProfiles = () => {
               value={item.iccid}
               onChange={(event) => handleUpdate(event.target.value, item.id, 'iccid')}
               onBlur={(event) => handleUpdateToDatabase(event.target.value, item.id, 'iccid')}
+              onFocus={(event) => setOriginalValue(event.target.value, item.id, 'iccid')}
+
             />
           ),
         },
@@ -287,14 +308,23 @@ const LandfillProfiles = () => {
   const theme = useTheme([
     {
       Table: `
-        --data-table-library_grid-template-columns:  175px 175px 175px 175px 175px;
+        --data-table-library_grid-template-columns:  ${isMobile ? '175px 175px 175px 175px 175px;' : '20% 20% 20% 20% 20%'};
         border: 1px solid rgba(34,36,38,.1) ;
       `,
       Row: `
       border-top: 1px solid rgba(34,36,38,.1)
       `,
+      HeaderCell: `
+      &:first-of-type {
+border-left: none ;
+    }
+        border-left: 1px solid rgba(34,36,38,.1) ;
+      padding: .92857143em 0.5rem;
+      background: #f9fafb;
+      font-weight: 700;
+    `,
       Cell: `
-      &:first-child {
+      &:first-of-type {
 border-left: none ;
     }
         border-left: 1px solid rgba(34,36,38,.1) ;
@@ -420,7 +450,7 @@ border-left: none ;
             </div>
             <Menu shadow="md" width={200}>
               <Menu.Target>
-                <ActionIcon>
+                <ActionIcon style={{background: 'var(--apis-light-blue-600)'}}>
                   <IconDots style={{ width: '1.2rem', height: '1.2rem' }} stroke={1.5} />
                 </ActionIcon>
               </Menu.Target>

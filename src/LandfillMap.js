@@ -181,7 +181,7 @@ const renderModals = () => {
   switch (activeContent) {
     case 'installation':
       return (
-        <InstallationModal onSubmit={handleAddGasWell} landfillsID={id}/>
+        <InstallationModal onSubmit={handleAddGasWell} landfillsID={id} gasWell={selectedGasWell}/>
       );
     case 'addGasWell':
       return (
@@ -198,12 +198,12 @@ const renderModals = () => {
 
   return (
     <>
-  <Modal zIndex={1050} opened={openedModal} onClose={closeModal}>
+  <Modal zIndex={10} opened={openedModal} onClose={closeModal}>
     {renderModals()}
   </Modal>
  
   <div>
-      <Drawer size={isMobile ? "80%" : "30%"} position="right" opened={opened} onClose={close} >
+      <Drawer zIndex={9} size={isMobile ? "80%" : "30%"} position="right" opened={opened} onClose={close} >
       {selectedGasWell && selectedGasWell.Devices && (
           <div>
             <div key={selectedGasWell.Devices.id}>

@@ -33,3 +33,32 @@ div.no-border div input {
   padding: 0 0.5rem;
   margin: 0;
 }
+
+:root {
+  --apis-light-blue-50: #effbff;
+  --apis-light-blue-100: #def6ff;
+  --apis-light-blue-200: #b6efff;
+  --apis-light-blue-300: #75e5ff;
+  --apis-light-blue-400: #2cd9ff;
+  --apis-light-blue-500: #00ccff;
+  --apis-light-blue-600: #009fd4;
+  --apis-light-blue-700: #007fab;
+  --apis-light-blue-800: #006b8d;
+  --apis-light-blue-900: #065874;
+  --apis-light-blue-950: #04384d;
+
+  --apis-gray-50: #f7f7f7;
+  --apis-gray-100: #ededed;
+  --apis-gray-200: #dfdfdf;
+  --apis-gray-300: #c8c8c8;
+  --apis-gray-400: #adadad;
+  --apis-gray-500: #9c9c9c;
+  --apis-gray-600: #888888;
+  --apis-gray-700: #7b7b7b;
+  --apis-gray-800: #676767;
+  --apis-gray-900: #545454;
+  --apis-gray-950: #363636;
+
+
+}
+
