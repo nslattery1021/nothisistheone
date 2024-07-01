@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/api';
 import { notifications } from '@mantine/notifications';
 import { useDisclosure } from '@mantine/hooks';
 import {
-  Accordion, Divider, Skeleton, Button, Modal, Flex, ActionIcon, Menu, Center, Loader, rem,
+  Accordion, Divider, Skeleton, Button, Modal, Flex, ActionIcon, Menu, Center, Select, TextInput, Loader, rem,
 } from '@mantine/core';
 import {
   IconMap, IconPhone, IconCalendarEvent, IconDots, IconMenu2, IconAdjustments, IconInfoCircleFilled, IconCpu, IconX, IconCheck
@@ -17,12 +17,16 @@ import { onCreateDevices, onUpdateDevices, onDeleteDevices } from './graphql/sub
 import { updateDevices } from './graphql/mutations';
 
 import moment from 'moment';
-import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
-import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
-import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
+import { CompactTable } from '@table-library/react-table-library/compact';
+import { useTheme } from "@table-library/react-table-library/theme";
+import { getTheme } from "@table-library/react-table-library/baseline";
+
+const key = 'Editable';
 
 const LandfillProfiles = () => {
   const { id } = useParams();
+  const [usedData, setUsedData] = useState([]);
+
   const [landfill, setLandfill] = useState(null);
   const [allDevices, setAllDevices] = useState([]);
   const [opened, { open, close }] = useDisclosure(false);
@@ -33,37 +37,135 @@ const LandfillProfiles = () => {
   const [addWellOpened, { open: openAddWell, close: closeAddWell }] = useDisclosure(false);
   const [activeContent, setActiveContent] = useState('general');
   const [rowData, setRowData] = useState([]);
-  
-  // Column Definitions: Defines the columns to be displayed.
-  const columnDefs = [
-    { headerName: "Device Name", field: "deviceName", editable: true, enableCellChangeFlash: true },
-    { 
-      headerName: "Device Type", 
-      field: "deviceType", 
-      editable: true, 
-      cellEditor: 'agRichSelectCellEditor',
-      cellEditorParams: {
-        values: ['Header Monitor', 'Smart Well']
-      },
-      cellRenderer: (params) => params.value
-    },
-    { headerName: "Serial Number", field: "serialNum", editable: true, enableCellChangeFlash: true },
-    { headerName: "Mac Address", field: "macAddress", editable: true, enableCellChangeFlash: true },
-    { headerName: "ICCID", field: "iccid", editable: true, enableCellChangeFlash: true },
-  ];
 
-  const defaultColDef = {
-    flex: 1,
-    minWidth: 175,
-    editable: true,
-    resizable: true,
+  const handleUpdate = (value, id, property) => {
+
+    console.log(value, id, property)
+    
+    setData((state) => ({
+      ...state,
+      nodes: state.nodes.map((node) => {
+        if (node.id === id) {
+          return { ...node, [property]: value };
+        } else {
+          return node;
+        }
+      }),
+    }));
   };
+
+  const handleUpdateToDatabase = async (value, id, property) => {
+
+    console.log(value, id, property)
+    
+    const foundData = data.nodes.find(dev => dev.id == id);
+    console.log(foundData)
+
+    try {
+      await client.graphql({
+        query: updateDevices,
+          variables: {
+              input: {
+                "id": foundData.id,
+                "macAddress": foundData.macAddress,
+                "deviceName": foundData.deviceName,
+                "iccid": foundData.iccid,
+                "serialNum": foundData.serialNum,
+                "deviceType": foundData.deviceType,
+              }
+          }
+      })
+      notifications.show({ message: 'Device updated successfully', color: 'green' })
+    } catch (error) {
+      console.log(error)
+      notifications.show({ message: `Error updating device: ${error}`, color: 'red' })
+    }
+  };
+    
+      const deviceTypeOptions = [
+        { value: 'Header Monitor', label: 'Header Monitor' },
+        { value: 'Smart Well', label: 'Smart Well' },
+      ];
+    
+      const COLUMNS = [
+        {
+          label: 'Device Name',
+          width: '175px',
+          renderCell: (item) => (
+            <TextInput
+              type="text"
+              className="no-border"
+              border={'none!important'}
+              style={{ width: '100%', border: 'none!important', outline: 'none', fontSize: '1rem', padding: 0, margin: 0 }}
+              value={item.deviceName}
+              onChange={(event) => handleUpdate(event.target.value, item.id, 'deviceName')}
+              onBlur={(event) => handleUpdateToDatabase(event, item.id, 'deviceName')}
+            />
+          ),
+        },
+        {
+          label: 'Type',
+          width: '175px',
+          renderCell: (item) => (
+            <Select
+              style={{ width: '100%', border: 'none', fontSize: '1rem', padding: 0, margin: 0 }}
+              className="no-border"
+              value={item.deviceType}
+              data={deviceTypeOptions}
+              onChange={(event) => handleUpdate(event, item.id, 'deviceType')}
+            >
+            </Select>
+          ),
+        },
+        {
+          label: 'Serial Number',
+          width: '175px',
+          renderCell: (item) => (
+            <TextInput
+              type="text"
+              className="no-border"
+              style={{ width: '100%', border: 'none', fontSize: '1rem', padding: 0, margin: 0 }}
+              value={item.serialNum}
+              onChange={(event) => handleUpdate(event.target.value, item.id, 'serialNum')}
+              onBlur={(event) => handleUpdateToDatabase(event.target.value, item.id, 'serialNum')}
+            />
+          ),
+        },
+        {
+          label: 'Mac Address',
+          width: '200px',
+          renderCell: (item) => (
+            <TextInput
+              type="text"
+              className="no-border"
+              style={{ width: '100%', border: 'none', fontSize: '1rem', padding: 0, margin: 0 }}
+              value={item.macAddress}
+              onChange={(event) => handleUpdate(event.target.value, item.id, 'macAddress')}
+              onBlur={(event) => handleUpdateToDatabase(event.target.value, item.id, 'macAddress')}
+            />
+          ),
+        },
+        {
+          label: 'ICCID',
+          width: '200px',
+          renderCell: (item) => (
+            <TextInput
+              type="text"
+              className="no-border"
+              style={{ width: '100%', border: 'none', fontSize: '1rem', padding: 0, margin: 0 }}
+              value={item.iccid}
+              onChange={(event) => handleUpdate(event.target.value, item.id, 'iccid')}
+              onBlur={(event) => handleUpdateToDatabase(event.target.value, item.id, 'iccid')}
+            />
+          ),
+        },
+      ];
 
   const isMobile = window.innerWidth <= 768;
   const client = generateClient();
 
   const columnLabels = ["Device Name", "Device Type", "Serial Number", "Mac Address", "ICCID"];
-  const [, setData] = useState([]);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     const fetchLandfill = async () => {
@@ -82,17 +184,21 @@ const LandfillProfiles = () => {
 
 
         setAllDevices(deviceData.data.devicesByLandfillsID.items);
-
         const initialData = deviceData.data.devicesByLandfillsID.items
         .sort((a, b) => a.deviceName.localeCompare(b.deviceName))
-        .map(device => ([
-          { value: device.deviceName || '' },
-          { value: device.deviceType || '' },
-          { value: device.serialNum || '' },
-          { value: device.macAddress || '' },
-          { value: device.iccid || '' },
-        ]));
-        setData(initialData);
+        .map(device => {
+          return {
+            'id': device.id,
+            'deviceName': device.deviceName || '',
+            'deviceType': device.deviceType || '',
+            'serialNum': device.serialNum || '',
+            'macAddress': device.macAddress || '',
+            'iccid': device.iccid || '',
+          };
+      });
+        setData({nodes: initialData});
+
+        console.log(initialData)
       } catch (error) {
         console.error('Error fetching dec:', error);
       }
@@ -109,13 +215,14 @@ const LandfillProfiles = () => {
         if (newEntry.landfillsID === id) {
           setAllDevices((prevDevices) => {
             const updatedDevices = [...prevDevices, newEntry].sort((a, b) => a.deviceName.localeCompare(b.deviceName));
-            setData(updatedDevices.map(device => ([
-              { value: device.deviceName || '' },
-              { value: device.deviceType || '' },
-              { value: device.serialNum || '' },
-              { value: device.macAddress || '' },
-              { value: device.iccid || '' },
-            ])));
+            setData({ nodes: updatedDevices.map(device => ({
+              'id': device.id,
+              'deviceName': device.deviceName || '',
+              'deviceType': device.deviceType || '',
+              'serialNum': device.serialNum || '',
+              'macAddress': device.macAddress || '',
+              'iccid': device.iccid || '',
+            }))});
             return updatedDevices;
           });
         }
@@ -134,13 +241,14 @@ const LandfillProfiles = () => {
             const updatedDevices = prevDevices.map((device) =>
               device.id === updatedDevice.id ? updatedDevice : device
             ).sort((a, b) => a.deviceName.localeCompare(b.deviceName));
-            setData(updatedDevices.map(device => ([
-              { value: device.deviceName || '' },
-              { value: device.deviceType || '' },
-              { value: device.serialNum || '' },
-              { value: device.macAddress || '' },
-              { value: device.iccid || '' },
-            ])));
+            setData({ nodes: updatedDevices.map(device => ({
+              'id': device.id,
+              'deviceName': device.deviceName || '',
+              'deviceType': device.deviceType || '',
+              'serialNum': device.serialNum || '',
+              'macAddress': device.macAddress || '',
+              'iccid': device.iccid || '',
+            }))});
             return updatedDevices;
           });
         }
@@ -156,13 +264,14 @@ const LandfillProfiles = () => {
         const deletedEntry = eventData.data.onDeleteDevices;
         setAllDevices((prevDevices) => {
           const updatedDevices = prevDevices.filter(device => device.id !== deletedEntry.id);
-          setData(updatedDevices.map(device => ([
-            { value: device.deviceName || '' },
-            { value: device.deviceType || '' },
-            { value: device.serialNum || '' },
-            { value: device.macAddress || '' },
-            { value: device.iccid || '' },
-          ])));
+          setData({ nodes: updatedDevices.map(device => ({
+            'id': device.id,
+            'deviceName': device.deviceName || '',
+            'deviceType': device.deviceType || '',
+            'serialNum': device.serialNum || '',
+            'macAddress': device.macAddress || '',
+            'iccid': device.iccid || '',
+          }))});
           return updatedDevices;
         });
       }
@@ -175,31 +284,24 @@ const LandfillProfiles = () => {
       deleteSub.unsubscribe();
     };
   }, [id]);
-
-  const handleCellValueChange = async (event) => {
-    const updatedDevice = { ...event.data };
-
-    console.log(updatedDevice)
-    try {
-    await client.graphql({
-      query: updateDevices,
-        variables: {
-            input: {
-              "id": updatedDevice.id,
-              "macAddress": updatedDevice.macAddress,
-              "deviceName": updatedDevice.deviceName,
-              "iccid": updatedDevice.iccid,
-              "serialNum": updatedDevice.serialNum,
-              "deviceType": updatedDevice.deviceType,
-            }
-        }
-    })
-    notifications.show({ message: 'Device updated successfully', color: 'green' })
-  } catch (error) {
-    console.log(error)
-    notifications.show({ message: `Error updating device: ${error}`, color: 'red' })
-  }
-  };
+  const theme = useTheme([
+    {
+      Table: `
+        --data-table-library_grid-template-columns:  175px 175px 175px 175px 175px;
+        border: 1px solid rgba(34,36,38,.1) ;
+      `,
+      Row: `
+      border-top: 1px solid rgba(34,36,38,.1)
+      `,
+      Cell: `
+      &:first-child {
+border-left: none ;
+    }
+        border-left: 1px solid rgba(34,36,38,.1) ;
+        border-top: 1px solid rgba(34,36,38,.1)
+    `,
+    },
+  ]);
 
   if (!allDevices) {
     return <Center style={{padding: '1rem', }}><Loader color="blue" /></Center>;
@@ -253,20 +355,12 @@ const LandfillProfiles = () => {
             <h5>Devices</h5>
             {allDevices ? 
             (
-              <div style={{ overflowX: 'auto', padding: '1rem 0' }}>
-                <div
-                  className="ag-theme-quartz" // applying the grid theme
-                  style={{height: '65vh'}}
-                >
-                  <AgGridReact
-                      rowData={allDevices}
-                      columnDefs={columnDefs}
-                      enableCellChangeFlash={true}
-                      onCellValueChanged={handleCellValueChange}
-                defaultColDef={defaultColDef}
+              <div style={{ overflow: 'auto', padding: '1rem 0' }}>
+                {data && 
 
-                  />
-                </div>
+                <CompactTable columns={COLUMNS} data={data} theme={theme} layout={{ custom: true }}/>
+                }
+                
             </div>
               
             ) : (
@@ -415,3 +509,4 @@ const LandfillProfiles = () => {
 };
 
 export default LandfillProfiles;
+

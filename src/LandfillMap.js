@@ -12,6 +12,7 @@ import { createGasWells } from './graphql/mutations';
 import { onCreateGasWells, onUpdateGasWells, onDeleteGasWells } from './graphql/subscriptions';
 
 import AddGasWell from './AddGasWell';
+import InstallationModal from './InstallationModal';
 import GoogleMapComponent from './GoogleMapComponent'; // Ensure correct import path
 import ServiceRequestWindow from './ServiceRequestWindow'; // Ensure correct import path
 
@@ -21,10 +22,12 @@ const LandfillMap = () => {
   const [gasWells, setGasWells] = useState([]);
   const [opened, { open, close }] = useDisclosure(false);
   const [openedModal, { open: openModal, close: closeModal }] = useDisclosure(false);
+  const [installOpened, { open: openInstall, close: closeInstall }] = useDisclosure(false);
   const [openAccordion, setOpenAccordion] = useState([]);
   const [drawerContent, setDrawerContent] = useState('');
   const [selectedGasWell, setSelectedGasWell] = useState(null);
   const [addWellOpened, { open: openAddWell, close: closeAddWell }] = useDisclosure(false);
+  const [activeContent, setActiveContent] = useState('');
 
 
   const handleButtonClick = (content) => {
@@ -174,14 +177,31 @@ notifications.show({
   }
 };
 
+const renderModals = () => {
+  switch (activeContent) {
+    case 'installation':
+      return (
+        <InstallationModal onSubmit={handleAddGasWell} landfillsID={id}/>
+      );
+    case 'addGasWell':
+      return (
+        <AddGasWell onSubmit={handleAddGasWell} landfillsID={id}/>
+      );
+      case 'serviceRequest':
+        return (
+          <ServiceRequestWindow/>
+        );
+    default:
+      return <div style={{ padding: '0.75rem' }}>Select an option from the menu.</div>;
+  }
+};
+
   return (
     <>
-  <Modal zIndex={1050} opened={openedModal} onClose={closeModal} title="Add Service Request">
-    <ServiceRequestWindow/>
+  <Modal zIndex={1050} opened={openedModal} onClose={closeModal}>
+    {renderModals()}
   </Modal>
-  <Modal opened={addWellOpened} onClose={closeAddWell} title="Add Gas Well">
-    <AddGasWell onSubmit={handleAddGasWell} landfillsID={id}/>
-  </Modal>
+ 
   <div>
       <Drawer size={isMobile ? "80%" : "30%"} position="right" opened={opened} onClose={close} >
       {selectedGasWell && selectedGasWell.Devices && (
@@ -207,7 +227,7 @@ notifications.show({
             </div>
             <Divider style={{ margin: '1rem 0'}}/>
             <Group justify="flex-end">
-              <Button onClick={openModal}>Add Service Request</Button>
+              <Button onClick={() => {setActiveContent('serviceRequest'); openModal();}}>Add Service Request</Button>
               <Button style={{padding: '0 0.25rem'}} variant="light">
                 <IconDots />
               </Button>
@@ -253,7 +273,9 @@ notifications.show({
           lng={landfill.lng} 
           landfillId={id}
           gasWells={gasWells}
-          openAddWell={openAddWell}/>
+          openAddWell={openModal}
+          setModalWindow={setActiveContent}
+          />
         </div>
         
     </div>

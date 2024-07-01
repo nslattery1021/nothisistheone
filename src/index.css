@@ -24,3 +24,12 @@ code {
 .custom-marker-title {
   font-weight: bold;
 }
+
+div.no-border div input {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  width: 100%;
+  padding: 0 0.5rem;
+  margin: 0;
+}

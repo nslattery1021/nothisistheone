@@ -8,7 +8,7 @@ import { Grid, ActionIcon, rem } from '@mantine/core';
 import { Icon, Label } from 'semantic-ui-react';
 
  
-const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer }) => {
+const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer, openModal, setModalWindow }) => {
   const [markerRef, marker] = useAdvancedMarkerRef();
   const [infoWindowShown, setInfoWindowShown] = useState(false);
 
@@ -134,7 +134,7 @@ const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer }) => {
             
             <ActionIcon.Group  style={{marginTop: '1rem', width: '100%'}}>
                 <ActionIcon variant="light" color="gray" size="lg" style={{flexGrow: 1}}><IconInfoCircle size={20} stroke={2} /></ActionIcon>
-                <ActionIcon variant="light" color="gray" size="lg" style={{flexGrow: 1}}><IconPackage size={20} stroke={2} /></ActionIcon>
+                <ActionIcon onClick={() => {setModalWindow('installation'); openModal();}} variant="light" color="gray" size="lg" style={{flexGrow: 1}}><IconPackage size={20} stroke={2} /></ActionIcon>
                 
                 {hasDevice && 
                   <>
