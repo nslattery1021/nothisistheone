@@ -6,7 +6,7 @@ import { Autocomplete, Menu, Modal, Divider, ActionIcon, Select, SelectProps, re
 import { useDisclosure } from '@mantine/hooks';
 import MarkerWithInfoWindow from './MarkerWithInfoWindow';
 
-const MyComponent = ({ gasWells, openDrawer, setSelectedGasWellId, handleGasWellSelect, openAddWell, setModalWindow }) => {
+const MyComponent = ({ gasWells, openDrawer, setSelectedGasWellId, handleGasWellSelect, setModalWindow }) => {
   const map = useMap('main-map');
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -14,13 +14,13 @@ const MyComponent = ({ gasWells, openDrawer, setSelectedGasWellId, handleGasWell
     position: 'absolute',
     top: '10px',
     right: '10px',
-    zIndex: 10 // Ensure the menu button is above the map
+    zIndex: 8 // Ensure the menu button is above the map
   };
   const searchInputStyle = {
     position: 'absolute',
     top: '10px',
     left: '10px',
-    zIndex: 10 // Ensure the menu button is above the map
+    zIndex: 8 // Ensure the menu button is above the map
   };
   useEffect(() => {
     if (!map) return;
@@ -89,9 +89,9 @@ const MyComponent = ({ gasWells, openDrawer, setSelectedGasWellId, handleGasWell
   <Menu.Dropdown>
       <Menu.Label>Map Options</Menu.Label>
       
-      <Menu.Item onClick={() => {setModalWindow('addGasWell'); openAddWell();}} leftSection={<IconPlus style={{ width: rem(14), height: rem(14) }} />}>Add Gas Well</Menu.Item>
+      <Menu.Item onClick={() => setModalWindow({modalName: 'addGasWell', modalTitle: 'Add Gas Well'})} leftSection={<IconPlus style={{ width: rem(14), height: rem(14) }} />}>Add Gas Well</Menu.Item>
       <Divider />
-      <Menu.Item leftSection={<IconAdjustmentsHorizontal style={{ width: rem(14), height: rem(14) }} />}>Filters</Menu.Item>
+      <Menu.Item onClick={() => setModalWindow({modalName: 'filters', modalTitle: 'Filters'})} leftSection={<IconAdjustmentsHorizontal style={{ width: rem(14), height: rem(14) }} />}>Filters</Menu.Item>
       <Menu.Item onClick={handleButtonClick('purchaseOrders')} leftSection={<IconClipboardText style={{ width: rem(14), height: rem(14) }} />}>Purchase Orders</Menu.Item>
   </Menu.Dropdown>
 </Menu>
@@ -109,7 +109,7 @@ renderOption={renderSelectOption}
 </>;
 };
 
-const GoogleMapComponent = ({ openDrawer, handleGasWellSelect, lat, lng, gasWells, openAddWell, setModalWindow }) => {
+const GoogleMapComponent = ({ openDrawer, handleGasWellSelect, lat, lng, gasWells, setModalWindow }) => {
     
   const [markerRef, marker] = useMarkerRef();
   const [selectedGasWellId, setSelectedGasWellId] = useState(null);
@@ -151,11 +151,15 @@ const GoogleMapComponent = ({ openDrawer, handleGasWellSelect, lat, lng, gasWell
                 openDrawer={openDrawer} 
                 key={well.id} 
                 props={well}
-                openModal={openAddWell} 
                 setModalWindow={setModalWindow} />
             ))}
         </Map>
-        <MyComponent gasWells={gasWells} openDrawer={openDrawer} setSelectedGasWellId={setSelectedGasWellId} handleGasWellSelect={handleGasWellSelect} openAddWell={openAddWell} setModalWindow={setModalWindow} />
+        <MyComponent 
+        gasWells={gasWells} 
+        openDrawer={openDrawer} 
+        setSelectedGasWellId={setSelectedGasWellId} 
+        handleGasWellSelect={handleGasWellSelect} 
+        setModalWindow={setModalWindow} />
       </APIProvider>
     );
   }

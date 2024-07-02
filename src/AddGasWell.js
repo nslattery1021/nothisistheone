@@ -1,17 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput, NumberInput, Button, Group, Box, Select } from '@mantine/core';
+import { TextInput, NumberInput, Button, Group, Box, Select, Loader } from '@mantine/core';
+import { IconMapPinFilled } from '@tabler/icons-react';
 
-const AddGasWellForm = ({ onSubmit, landfillsID }) => {
-  const [gasWellName, setGasWellName] = useState('');
-  const [lat, setLat] = useState('');
-  const [lng, setLng] = useState('');
-  const [type, setType] = useState('');
-  const [subtype, setSubtype] = useState('');
+const AddGasWellForm = ({ onSubmit, landfillsID, gasWell }) => {
+  const [gasWellName, setGasWellName] = useState(gasWell?.gasWellName ?? '');
+  const [lat, setLat] = useState(gasWell?.lat ?? '');
+  const [lng, setLng] = useState(gasWell?.lng ?? '');
+  const [type, setType] = useState(gasWell?.type ?? '');
+  const [subtype, setSubtype] = useState(gasWell?.subtype ?? '');
+  const [id, setId] = useState(gasWell?.id ?? '');
+  const [userLocation, setUserLocation] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const typeOptions = [
     { value: 'Header Monitor', label: 'Header Monitor' },
     { value: 'Smart Well', label: 'Smart Well' },
   ];
+
+  const getUserLocation = () => {
+    // if geolocation is supported by the users browser
+if(lat && lng){
+  if(!window.confirm("Would you like to update the location?")){
+    return;
+  }
+}
+
+    if (navigator.geolocation) {
+      // get the current users location
+      setLoading(true);
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          // save the geolocation coordinates in two variables
+          const { latitude, longitude } = position.coords;
+          // update the value of userlocation variable
+          setUserLocation({ latitude, longitude });
+
+          console.log(latitude, longitude)
+          
+          setLat(latitude);
+          setLng(longitude);
+
+          setLoading(false);
+
+        },
+        // if there was an error getting the users location
+        (error) => {
+          console.error('Error getting user location:', error);
+          setLoading(false);
+
+        }
+      );
+    }
+    // if geolocation is not supported by the users browser
+    else {
+      console.error('Geolocation is not supported by this browser.');
+    }
+  };
 
   const subtypeOptions = {
     'Header Monitor': [
@@ -26,13 +71,15 @@ const AddGasWellForm = ({ onSubmit, landfillsID }) => {
   };
 
   useEffect(() => {
-    // Reset subtype when type changes
-    setSubtype('');
-  }, [type]);
+    // Only reset subtype if type is changed to a different value
+    if (type && !subtypeOptions[type].some(option => option.value === subtype)) {
+      setSubtype('');
+    }
+  }, [type, subtype]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newGasWell = { gasWellName, lat, lng, type, subtype, landfillsID };
+    const newGasWell = { id, gasWellName, lat, lng, type, subtype, landfillsID };
     onSubmit(newGasWell);
     // Clear the form fields
     setGasWellName('');
@@ -65,6 +112,7 @@ const AddGasWellForm = ({ onSubmit, landfillsID }) => {
           required
           precision={6}
         />
+        <Button style={{margin: '0.5rem 0'}} leftSection={<IconMapPinFilled size={14} />} disabled={loading} onClick={getUserLocation}>{loading ? <Loader  color="blue" size="xs" /> : 'Get Location'}</Button>
         <Select
           label="Type"
           value={type}
@@ -77,11 +125,11 @@ const AddGasWellForm = ({ onSubmit, landfillsID }) => {
           value={subtype}
           onChange={(value) => setSubtype(value)}
           data={type ? subtypeOptions[type] : []}
-          disabled={!type}
+          disabled={!type && !subtype}
           required
         />
         <Group position="right" mt="md">
-          <Button type="submit">Add Gas Well</Button>
+          <Button type="submit">{gasWell ? 'Update Gas Well' : 'Add Gas Well'}</Button>
         </Group>
       </form>
     </Box>

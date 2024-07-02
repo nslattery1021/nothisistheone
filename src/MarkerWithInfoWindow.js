@@ -4,23 +4,21 @@ import {  AdvancedMarker,
     Pin,
     useAdvancedMarkerRef } from '@vis.gl/react-google-maps';
 import { IconGaugeFilled, IconInfoCircle, IconPackage, IconCpu, IconTool, IconMenu2, IconPlus, IconAdjustmentsHorizontal } from '@tabler/icons-react';
-import { Grid, ActionIcon, rem } from '@mantine/core';
+import { Button, ActionIcon, rem } from '@mantine/core';
 import { Icon, Label } from 'semantic-ui-react';
+import { translate } from '@aws-amplify/ui';
 
  
-const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer, openModal, setModalWindow }) => {
+const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer, setModalWindow }) => {
   const [markerRef, marker] = useAdvancedMarkerRef();
   const [infoWindowShown, setInfoWindowShown] = useState(false);
 
-  // clicking the marker will toggle the infowindow
   const handleMarkerClick = useCallback(() => {
     onClick(props.id);
   }, [onClick, props.id]);
 
+  const hasDevice = !!props.gasWellsDevicesId;
 
-    const hasDevice = !!props.gasWellsDevicesId;
-
-  
   const installed = '#23ad5c';
   const notInstalled = '#525252';
   const onHold = '#f44336';
@@ -80,8 +78,27 @@ const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer, openModa
                   </h4>
                 </div>
               </div>
-
-              
+              {props.Devices?.Services?.items.some(serv => !serv.isComplete) && (() => {
+                const services = props.Devices?.Services?.items.filter(serv => !serv.isComplete);
+                console.log(services)
+                return (
+                  <Label style={{padding: '0', margin: '0px !important', transform: 'translateX(-50%)', top: '-1.5em', position: 'absolute', zIndex: '100', left: '100%'}}>
+                    <Button.Group>
+                      {services.filter(serv => serv.priority === "High").length > 0 && 
+                        <Button size="xs" color="red">{services.filter(serv => serv.priority === "High").length}</Button>
+                      }
+                      {services.filter(serv => serv.priority === "Medium").length > 0 && 
+                        <Button size="xs" color="orange">{services.filter(serv => serv.priority === "Medium").length}</Button>
+                      }
+                      {services.filter(serv => serv.priority === "Low").length > 0 && 
+                        <Button size="xs" color="yellow">{services.filter(serv => serv.priority === "Low").length}</Button>
+                      }
+                    </Button.Group>
+                  </Label>
+                );
+              })()}
+  
+      
             </Label>
       </AdvancedMarker>
       {isSelected && (
@@ -110,7 +127,7 @@ const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer, openModa
             </div>
             <div>
               <h3 style={{margin: '0'}}>
-                {hasDevice ? 
+                {hasDevice && props.Devices?.macAddress ? 
                     <a target={"_blank"} href={`https://console.particle.io/medora-16572/devices/${props.Devices.macAddress}`}>{props.gasWellName}</a>
                     :
                     <>
@@ -133,8 +150,8 @@ const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer, openModa
             
             
             <ActionIcon.Group  style={{marginTop: '1rem', width: '100%'}}>
-                <ActionIcon variant="light" color="gray" size="lg" style={{flexGrow: 1}}><IconInfoCircle size={20} stroke={2} /></ActionIcon>
-                <ActionIcon onClick={() => {setModalWindow('installation'); openModal();}} variant="light" color="gray" size="lg" style={{flexGrow: 1}}><IconPackage size={20} stroke={2} /></ActionIcon>
+                <ActionIcon onClick={() =>  setModalWindow({modalName: 'editGasWell', modalTitle: `Edit ${props.gasWellName}`})} variant="light" color="gray" size="lg" style={{flexGrow: 1}}><IconInfoCircle size={20} stroke={2} /></ActionIcon>
+                <ActionIcon onClick={() => setModalWindow({modalName: 'installation', modalTitle: 'Installation'})} variant="light" color="gray" size="lg" style={{flexGrow: 1}}><IconPackage size={20} stroke={2} /></ActionIcon>
                 
                 {hasDevice && 
                   <>

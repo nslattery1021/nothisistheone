@@ -34,6 +34,174 @@ div.no-border div input {
   margin: 0;
 }
 
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  margin-left: 50px;
+
+}
+.timeline__event {
+    background: #fff;
+    margin-bottom: 20px;
+    position: relative;
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.timeline__event__title {
+    font-size: 1.2rem;
+      /*line-height: 1.4;*/
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #9251ac;
+      letter-spacing: 1.5px;
+}
+
+.timeline__event__content {
+    /*padding: 1rem;*/
+}
+
+.timeline__event__content i {
+    position: absolute;
+    top: 13px;
+    left:-35px;
+    font-size: 0.35rem;
+    transform: translateY(-50%);
+    z-index: 2;
+    color: #9251ac;
+}
+
+.timeline__event__description {
+    flex-basis: 60%;
+    cursor: pointer;
+}
+
+.timeline__event:after {
+      content: "";
+      width: 2px;
+      height: 110%;
+      background: #9251ac;
+      position: absolute;
+      top: 1.25rem;
+      left: -28.5px;
+      z-index: 0;
+}
+.timeline__event:before {
+      content: "";
+      width: 2rem;
+      height: 2rem;
+      position: absolute;
+      background: #f6a4ec;
+      border-radius: 100%;
+      left: -3rem;
+      /*// right: 90%;*/
+      top: 1rem;
+      z-index: 1;
+      transform: translateY(-50%);
+      border: 2px solid #9251ac;
+}
+
+.timeline__event--type2:before {
+    background: #DCDCDC;
+    border-color: #919191;
+}
+
+.timeline__event--typeLow:before {
+    background: #FFFFD1;
+    border-color: #fbbd08;
+}
+
+.timeline__event--typeMedium:before {
+    background: #FFE4B5;
+    border-color: #f2711c;
+}
+
+.timeline__event--typeHigh:before {
+    background: #FFC0CB;
+    border-color: #db2828;
+}
+
+.timeline__event--type2:after {
+    background: #919191;
+}
+.timeline__event--typeLow:after {
+    background: #fbbd08;
+}
+.timeline__event--typeMedium:after {
+    background: #f2711c;
+}
+.timeline__event--typeHigh:after {
+    background: #db2828;
+}
+
+.timeline__event--type2 .timeline__event__icon {
+    background: #919191;
+    color: #919191;
+}
+
+.timeline__event--type2 i {
+    color: #919191;
+    margin: 0;
+}
+
+.timeline__event--type2 i.valve {
+    background-color: #919191;
+    margin: 0;
+}
+
+.timeline__event--type2 .timeline__event__title {
+    color: #919191;
+}
+
+.timeline__event--typeLow .timeline__event__icon {
+    background: #fbbd08;
+    color: #fbbd08;
+}
+
+.timeline__event--typeLow i {
+    color: #fbbd08;
+    margin: 0;
+}
+
+.timeline__event--typeLow .timeline__event__title {
+    color: #fbbd08;
+}
+
+.timeline__event--typeMedium .timeline__event__icon {
+    background: #f2711c;
+    color: #f2711c;
+}
+
+.timeline__event--typeMedium i {
+    color: #f2711c;
+    margin: 0;
+}
+
+.timeline__event--typeMedium .timeline__event__title {
+    color: #f2711c;
+}
+
+.timeline__event--typeHigh .timeline__event__icon {
+    background: #db2828;
+    color: #db2828;
+}
+
+.timeline__event--typeHigh i {
+    color: #db2828;
+    margin: 0;
+}
+
+.timeline__event--typeHigh .timeline__event__title {
+    color: #db2828;
+}
+
+.timeline__event:last-child:not(.hiddenElement)::after {
+      content: none;
+}
+
+
 :root {
   --apis-light-blue-50: #effbff;
   --apis-light-blue-100: #def6ff;
@@ -59,6 +227,40 @@ div.no-border div input {
   --apis-gray-900: #545454;
   --apis-gray-950: #363636;
 
+  --apis-red-50: #fef2f2;
+  --apis-red-100: #fee2e2;
+  --apis-red-200: #fecaca;
+  --apis-red-300: #fba6a6;
+  --apis-red-400: #f77272;
+  --apis-red-500: #ee4545;
+  --apis-red-600: #db2828;
+  --apis-red-700: #b81d1d;
+  --apis-red-800: #981c1c;
+  --apis-red-900: #7e1e1e;
+  --apis-red-950: #450a0a;
 
+  --apis-orange-50: #fef7ee;
+  --apis-orange-100: #feedd6;
+  --apis-orange-200: #fbd6ad;
+  --apis-orange-300: #f9b878;
+  --apis-orange-400: #f59142;
+  --apis-orange-500: #f2711c;
+  --apis-orange-600: #e35713;
+  --apis-orange-700: #bc4112;
+  --apis-orange-800: #963416;
+  --apis-orange-900: #792e15;
+  --apis-orange-950: #411409;
+
+  --apis-yellow-50: #fffdea;
+  --apis-yellow-100: #fffbc6;
+  --apis-yellow-200: #fff687;
+  --apis-yellow-300: #ffea49;
+  --apis-yellow-400: #ffdb1f;
+  --apis-yellow-500: #fbbd08;
+  --apis-yellow-600: #de9101;
+  --apis-yellow-700: #b86705;
+  --apis-yellow-800: #954f0b;
+  --apis-yellow-900: #7b410c;
+  --apis-yellow-950: #472101;
 }
 
