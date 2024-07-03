@@ -242,6 +242,7 @@ const handleAddGasWell = async (newGasWell) => {
   }
 };
 
+
 const handleEditGasWell = async (newGasWell) => {
 
   console.log(newGasWell)
