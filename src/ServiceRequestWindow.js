@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TextInput, NumberInput, Button, Group, Box, Select, Textarea } from '@mantine/core';
 import { IconMapPinFilled } from '@tabler/icons-react';
 
-const ServiceRequestWindow = ({ onSubmit, service, devicesID, serviceTypes }) => {
+const ServiceRequestWindow = ({ onSubmit, service, devicesID, serviceTypes, deleteServiceRequest }) => {
   const [title, setTitle] = useState(service?.title ?? '');
   const [priority, setPriority] = useState(service?.priority ?? 'Low');
   const [servicetypesID, setServicetypesID] = useState(service?.servicetypesID ?? '');
@@ -42,7 +42,8 @@ const ServiceRequestWindow = ({ onSubmit, service, devicesID, serviceTypes }) =>
           data={["High","Medium","Low"]}
           required
         />
-        <Group position="right" mt="md">
+        <Group grow position="right" mt="md">
+          <Button onClick={() => deleteServiceRequest(service)} style={{display: !!service ? '' : 'none'}} color='red'>Delete</Button>
           <Button disabled={!priority || !servicetypesID || !title} type="submit">{service ? 'Update Service' : 'Add Service'}</Button>
         </Group>
       </form>

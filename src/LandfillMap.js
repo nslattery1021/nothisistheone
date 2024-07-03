@@ -4,11 +4,11 @@ import { generateClient } from 'aws-amplify/api';
 import { useDisclosure } from '@mantine/hooks';
 import { ActionIcon, Accordion, Divider, Drawer, Button, Group, Modal, Timeline, Text, Loader, Center, Menu, rem } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconDots, IconSettings, IconListDetails, IconTool, IconCheck } from '@tabler/icons-react';
+import { IconDots, IconGaugeFilled, IconListDetails, IconTool, IconCheck } from '@tabler/icons-react';
 import moment from 'moment';
 
 import { getLandfills, getGasWells, gasWellsByLandfillsID, listServiceTypes } from './graphql/queries';
-import { createGasWells, updateGasWells, createService } from './graphql/mutations';
+import { createGasWells, updateGasWells, createService, deleteService } from './graphql/mutations';
 import { onCreateGasWells, onUpdateGasWells, onDeleteGasWells } from './graphql/subscriptions';
 
 import AddGasWell from './AddGasWell';
@@ -23,13 +23,11 @@ const LandfillMap = () => {
   const [gasWells, setGasWells] = useState([]);
   const [opened, { open, close }] = useDisclosure(false);
   const [openedModal, { open: openModal, close: closeModal }] = useDisclosure(false);
-  const [installOpened, { open: openInstall, close: closeInstall }] = useDisclosure(false);
   const [openAccordion, setOpenAccordion] = useState(['incomplete']);
   const [drawerContent, setDrawerContent] = useState('');
   const [selectedGasWell, setSelectedGasWell] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
   const [selectedDevice, setSelectedDevice] = useState(null);
-  const [addWellOpened, { open: openAddWell, close: closeAddWell }] = useDisclosure(false);
   const [activeContent, setActiveContent] = useState('');
   const [activeContentTitle, setActiveContentTitle] = useState('');
   const [serviceTypes, setServiceTypes] = useState(null);
@@ -164,9 +162,14 @@ console.log(allServiceTypes)
           
           {allServices.length > 0 ? (
  
-            <Timeline bulletSize={32} lineWidth={3}>
+            <Timeline bulletSize={32} lineWidth={3} style={{cursor: 'pointer'}}>
               {allServices.map(service => (
                     <Timeline.Item 
+                    onClick={() => {
+                      setSelectedDevice(selectedGasWell.Devices); 
+                      setSelectedService(service); 
+                      handleOpeningModal({modalName: 'serviceRequest', modalTitle: 'Edit Service Request'});
+                      }}
                     key={service.id}
                     lineActive={true} 
                     active={true} 
@@ -185,6 +188,36 @@ console.log(allServiceTypes)
       );
 };
 
+
+const deleteServiceRequest = async (service) => {
+  console.log(service)
+
+  if(window.confirm('Are you sure you want to delete this service request?')){
+
+  try {
+    const result = await client.graphql({
+      query: deleteService,
+      variables: { input: {
+        "id": service.id
+      } }
+    });
+    
+notifications.show({
+  id: 'success-delete-service',
+  withCloseButton: true,
+  autoClose: 5000,
+  title: 'Service Request Deleted!',
+  message: `'${service.title}' has been deleted.`,
+  icon: <IconCheck />,
+  color: 'red'
+});
+    closeModal();
+  } catch (error) {
+    console.error('Error deleting service:', error);
+  }
+
+}
+}
 const handleService = async (newService) => {
   console.log(newService)
   try {
@@ -282,7 +315,12 @@ const renderModals = () => {
       );
     case 'serviceRequest':
       return (
-        <ServiceRequestWindow onSubmit={handleService} devicesID={selectedDevice.id} serviceTypes={serviceTypes}/>
+        <ServiceRequestWindow 
+        onSubmit={handleService} 
+        service={selectedService} 
+        devicesID={selectedDevice.id} 
+        serviceTypes={serviceTypes}
+        deleteServiceRequest={deleteServiceRequest}/>
       );
     case 'editGasWell':
         return (
@@ -342,7 +380,12 @@ const handleOpeningModal = ({ modalName, modalTitle }) => {
             </div>
             <Divider style={{ margin: '1rem 0'}}/>
             <Group justify="flex-end">
-              <Button onClick={() => {setSelectedDevice(selectedGasWell.Devices); handleOpeningModal({modalName: 'serviceRequest', modalTitle: 'Add Service Request'});}}>Add Service Request</Button>
+              <Button 
+              onClick={() => {
+                setSelectedDevice(selectedGasWell.Devices); 
+                setSelectedService(null); 
+                handleOpeningModal({modalName: 'serviceRequest', modalTitle: 'Add Service Request'});
+                }}>Add Service Request</Button>
               <Menu shadow="md">
                 <Menu.Target>
                   <Button style={{padding: '0 0.25rem'}} variant="light">
@@ -350,9 +393,12 @@ const handleOpeningModal = ({ modalName, modalTitle }) => {
                   </Button>
                 </Menu.Target>
                 <Menu.Dropdown>
-                  <Menu.Label>Application</Menu.Label>
-                  <Menu.Item leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}>
-                    Settings
+                  <Menu.Label>More Options</Menu.Label>
+                  <Menu.Item>
+                    CalGas
+                  </Menu.Item>
+                  <Menu.Item>
+                    QED Valve
                   </Menu.Item>
                 </Menu.Dropdown>
               </Menu>
