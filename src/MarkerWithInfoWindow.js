@@ -4,9 +4,11 @@ import {  AdvancedMarker,
     Pin,
     useAdvancedMarkerRef } from '@vis.gl/react-google-maps';
 import { IconGaugeFilled, IconInfoCircle, IconPackage, IconCpu, IconTool, IconMenu2, IconPlus, IconAdjustmentsHorizontal } from '@tabler/icons-react';
-import { Button, ActionIcon, rem } from '@mantine/core';
+import { Button, ActionIcon, HoverCard, Popover, Group, Text, rem } from '@mantine/core';
 import { Icon, Label } from 'semantic-ui-react';
 import { translate } from '@aws-amplify/ui';
+
+import moment from 'moment';
 
  
 const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer, setModalWindow }) => {
@@ -142,8 +144,82 @@ const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer, setModal
                     </>
                   }
               <div style={{fontSize: '0.85rem'}}>{props.type} • {props.subtype}</div>
-              <div style={{display: 'flex', marginTop: '0.5rem', gap: '0.25rem'}}>
-                <Label><Icon name='tachometer alternate' /> 23</Label>
+              <div style={{display: 'flex', marginTop: '0.5rem', gap: '0.35rem', flexWrap: 'wrap'}}>
+              
+              <Group justify="center">
+                <HoverCard shadow="md">
+                  <HoverCard.Target>
+                  <div><Label><Icon name='tachometer alternate' /> 23</Label></div>
+                  </HoverCard.Target>
+                  <HoverCard.Dropdown>
+                  <div class="tooltiptext" style={{
+                    lineHeight: '1'
+                  }}>
+                        <div
+                        style={{
+                          lineHeight: '1',
+                          fontSize: '1rem',
+                          marginBottom: '0.35rem',
+                          fontWeight: '600'
+                        }}>CalGas Reading</div>
+                        <div
+                        style={{
+                          lineHeight: '1.3',
+                          color: 'gray',
+                          fontSize: '0.75rem',
+                          fontWeight: '400'
+                        }}>
+                            <div>Last entry by Neil Slattery</div>
+                            <div>at {moment(new Date()).format('l h:mm a')}</div>
+                        </div>
+                    </div>
+                  </HoverCard.Dropdown>
+                </HoverCard>
+              </Group>
+              <Group justify="center">
+                <HoverCard shadow="md">
+                  <HoverCard.Target>
+                  <div><Label color='yellow'><div style={{
+                      display: 'flex',
+                      gap: '0.75rem',
+                      alignItems: 'center'
+                    }}>
+                      <div style={{
+                        backgroundColor: 'white', 
+                        mask: `url(/valve-icon.svg) no-repeat center / contain`,
+                        WebkitMask: `url(/valve-icon.svg) no-repeat center / contain`,
+                        height: '11px',
+                        width: '10px',
+                      }}></div>
+                      50
+                    </div></Label></div>
+                  </HoverCard.Target>
+                  <HoverCard.Dropdown>
+                  <div class="tooltiptext" style={{
+                    lineHeight: '1'
+                  }}>
+                        <div
+                        style={{
+                          lineHeight: '1',
+                          fontSize: '1rem',
+                          marginBottom: '0.35rem',
+                          fontWeight: '600'
+                        }}>QED Position</div>
+                        <div
+                        style={{
+                          lineHeight: '1.3',
+                          color: 'gray',
+                          fontSize: '0.75rem',
+                          fontWeight: '400'
+                        }}>
+                            <div>Last entry by Neil Slattery</div>
+                            <div>at {moment(new Date()).format('l h:mm a')}</div>
+                        </div>
+                    </div>
+                  </HoverCard.Dropdown>
+                </HoverCard>
+              </Group>
+                <div><Label color='green'><Icon name='tint' />Pump</Label></div>
               </div>
             </div>
           </div>

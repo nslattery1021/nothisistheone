@@ -8,7 +8,7 @@ import { IconDots, IconGaugeFilled, IconListDetails, IconTool, IconCheck } from 
 import moment from 'moment';
 
 import { getLandfills, getGasWells, gasWellsByLandfillsID, listServiceTypes } from './graphql/queries';
-import { createGasWells, updateGasWells, createService, deleteService } from './graphql/mutations';
+import { createGasWells, updateGasWells, createService, updateService, deleteService } from './graphql/mutations';
 import { onCreateGasWells, onUpdateGasWells, onDeleteGasWells } from './graphql/subscriptions';
 
 import AddGasWell from './AddGasWell';
@@ -16,6 +16,9 @@ import InstallationModal from './InstallationModal';
 import GoogleMapComponent from './GoogleMapComponent'; // Ensure correct import path
 import ServiceRequestWindow from './ServiceRequestWindow'; // Ensure correct import path
 import Filters from './Filters'; // Ensure correct import path
+
+import { Icon } from 'semantic-ui-react';
+
 
 const LandfillMap = () => {
   const { id } = useParams();
@@ -219,36 +222,46 @@ notifications.show({
 }
 }
 const handleService = async (newService) => {
-  console.log(newService)
-  try {
-    const result = await client.graphql({
-      query: createService,
-      variables: { input: {
-        "title": newService.title,
-        "completedNotes": "",
-        "isComplete": false,
-        "priority": newService.priority,
-        "devicesID": newService.devicesID,
-        "servicetypesID": newService.servicetypesID
-      } }
-    });
-    
-console.log("RESULT",result)
+  console.log(newService);
 
-notifications.show({
-  id: 'success-adding-service',
-  withCloseButton: true,
-  autoClose: 5000,
-  title: 'New Service Request Added!',
-  message: `'${newService.title}' has been added.`,
-  icon: <IconCheck />,
-  color: 'green'
-});
+  const isEdit = !!newService.id;
+  const query = isEdit ? updateService : createService;
+  const variables = {
+    input: {
+      id: newService.id, // Only include id if it's an edit
+      title: newService.title,
+      completedNotes: newService.completedNotes ?? "", // Make sure to handle notes if present
+      isComplete: newService.isComplete ?? false,
+      priority: newService.priority,
+      devicesID: newService.devicesID,
+      servicetypesID: newService.servicetypesID
+    }
+  };
+  console.log(newService);
+  console.log("Edit?",isEdit);
+
+  try {
+    const result = await client.graphql({ query: query, variables: variables });
+
+    const message = isEdit
+      ? `Service request '${newService.title}' has been updated.`
+      : `New service request '${newService.title}' has been added.`;
+
+    notifications.show({
+      id: 'service-action-success',
+      withCloseButton: true,
+      autoClose: 5000,
+      title: isEdit ? 'Service Request Updated!' : 'New Service Request Added!',
+      message,
+      icon: <IconCheck />,
+      color: 'green'
+    });
     closeModal();
   } catch (error) {
-    console.error('Error adding service:', error);
+    console.error(`Error ${isEdit ? 'updating' : 'adding'} service:`, error);
   }
-}
+};
+
 
 const handleAddGasWell = async (newGasWell) => {
 
@@ -395,16 +408,40 @@ const handleOpeningModal = ({ modalName, modalTitle }) => {
                 <Menu.Dropdown>
                   <Menu.Label>More Options</Menu.Label>
                   <Menu.Item>
+                  <div style={{
+                      display: 'flex',
+                      gap: '0.65rem',
+                      justifyContent: 'flex-start',
+                      alignItems: 'center'
+                    }}>
+                  <Icon name='tachometer alternate' />
                     CalGas
+                    </div>
                   </Menu.Item>
                   <Menu.Item>
-                    QED Valve
+                    <div style={{
+                      display: 'flex',
+                      gap: '0.95rem',
+                      justifyContent: 'flex-start',
+
+                      alignItems: 'center'
+                    }}>
+                      <div style={{
+                        backgroundColor: 'black', 
+                        mask: `url(/valve-icon.svg) no-repeat center / contain`,
+                        WebkitMask: `url(/valve-icon.svg) no-repeat center / contain`,
+                        height: '18px',
+                        width: '14px',
+                      }}></div>
+                      QED Valve
+                    </div>
+                  
                   </Menu.Item>
                 </Menu.Dropdown>
               </Menu>
             </Group>
              <div style={{ margin: '1rem 0'}}>
-              <Accordion multiple  onChange={setOpenAccordion}>
+              <Accordion multiple onChange={setOpenAccordion}>
                 <Accordion.Item style={{borderBottom: '0'}} value={"incomplete"}>
                   <Accordion.Control style={{borderBottom: '1px solid var(--apis-gray-200)'}}>To Do</Accordion.Control>
                   <Accordion.Panel style={{paddingTop: '0.5rem'}}>
