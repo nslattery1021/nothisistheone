@@ -3,15 +3,14 @@ import {  AdvancedMarker,
     InfoWindow,
     Pin,
     useAdvancedMarkerRef } from '@vis.gl/react-google-maps';
-import { IconGaugeFilled, IconInfoCircle, IconPackage, IconCpu, IconTool, IconMenu2, IconPlus, IconAdjustmentsHorizontal } from '@tabler/icons-react';
-import { Button, ActionIcon, HoverCard, Popover, Group, Text, rem } from '@mantine/core';
+import { IconInfoCircle, IconPackage, IconCpu, IconTool } from '@tabler/icons-react';
+import { Button, ActionIcon, HoverCard, Group } from '@mantine/core';
 import { Icon, Label } from 'semantic-ui-react';
-import { translate } from '@aws-amplify/ui';
 
 import moment from 'moment';
 
  
-const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer, setModalWindow }) => {
+const MarkerWithInfoWindow = ({ props, allDevices, isSelected, onClick, openDrawer, setModalWindow }) => {
   const [markerRef, marker] = useAdvancedMarkerRef();
   const [infoWindowShown, setInfoWindowShown] = useState(false);
 
@@ -19,7 +18,12 @@ const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer, setModal
     onClick(props.id);
   }, [onClick, props.id]);
 
+  // console.log("Found Device",allDevices[props.gasWellsDevicesId])
+
+
   const hasDevice = !!props.gasWellsDevicesId;
+
+  const linkedDevice = allDevices[props.gasWellsDevicesId];
 
   const installed = '#23ad5c';
   const notInstalled = '#525252';
@@ -80,9 +84,8 @@ const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer, setModal
                   </h4>
                 </div>
               </div>
-              {props.Devices?.Services?.items.some(serv => !serv.isComplete) && (() => {
-                const services = props.Devices?.Services?.items.filter(serv => !serv.isComplete);
-                console.log(services)
+              {linkedDevice?.Services?.items.some(serv => !serv.isComplete) && (() => {
+                const services = linkedDevice?.Services?.items.filter(serv => !serv.isComplete);
                 return (
                   <Label style={{padding: '0', margin: '0px !important', transform: 'translateX(-50%)', top: '-1.5em', position: 'absolute', zIndex: '100', left: '100%'}}>
                     <Button.Group>
@@ -129,8 +132,8 @@ const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer, setModal
             </div>
             <div>
               <h3 style={{margin: '0'}}>
-                {hasDevice && props.Devices?.macAddress ? 
-                    <a target={"_blank"} href={`https://console.particle.io/medora-16572/devices/${props.Devices.macAddress}`}>{props.gasWellName}</a>
+                {hasDevice && linkedDevice?.macAddress ? 
+                    <a target={"_blank"} href={`https://console.particle.io/medora-16572/devices/${linkedDevice.macAddress}`}>{props.gasWellName}</a>
                     :
                     <>
                     {props.gasWellName}
@@ -139,8 +142,8 @@ const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer, setModal
               </h3>
               {hasDevice && 
                     <>
-                      <div style={{fontSize: '0.85rem'}}>{props.Devices.serialNum}</div>
-                      <div style={{fontSize: '0.85rem'}}>{props.Devices.deviceName}</div>
+                      <div style={{fontSize: '0.85rem'}}>{linkedDevice.serialNum}</div>
+                      <div style={{fontSize: '0.85rem'}}>{linkedDevice.deviceName}</div>
                     </>
                   }
               <div style={{fontSize: '0.85rem'}}>{props.type} • {props.subtype}</div>
@@ -152,7 +155,7 @@ const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer, setModal
                   <div><Label><Icon name='tachometer alternate' /> 23</Label></div>
                   </HoverCard.Target>
                   <HoverCard.Dropdown>
-                  <div class="tooltiptext" style={{
+                  <div className="tooltiptext" style={{
                     lineHeight: '1'
                   }}>
                         <div
@@ -177,7 +180,7 @@ const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer, setModal
                 </HoverCard>
               </Group>
               <Group justify="center">
-                <HoverCard shadow="md">
+                <HoverCard closeDelay={100} shadow="md">
                   <HoverCard.Target>
                   <div><Label color='yellow'><div style={{
                       display: 'flex',
@@ -195,7 +198,7 @@ const MarkerWithInfoWindow = ({ props, isSelected, onClick, openDrawer, setModal
                     </div></Label></div>
                   </HoverCard.Target>
                   <HoverCard.Dropdown>
-                  <div class="tooltiptext" style={{
+                  <div className="tooltiptext" style={{
                     lineHeight: '1'
                   }}>
                         <div

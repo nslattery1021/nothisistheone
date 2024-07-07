@@ -65,6 +65,7 @@ export const onCreateService = /* GraphQL */ `
       priority
       devicesID
       servicetypesID
+      userId
       createdAt
       updatedAt
       __typename
@@ -81,6 +82,7 @@ export const onUpdateService = /* GraphQL */ `
       priority
       devicesID
       servicetypesID
+      userId
       createdAt
       updatedAt
       __typename
@@ -97,6 +99,7 @@ export const onDeleteService = /* GraphQL */ `
       priority
       devicesID
       servicetypesID
+      userId
       createdAt
       updatedAt
       __typename
@@ -120,6 +123,7 @@ export const onCreateDevices = /* GraphQL */ `
         nextToken
         __typename
       }
+      userId
       createdAt
       updatedAt
       __typename
@@ -143,6 +147,7 @@ export const onUpdateDevices = /* GraphQL */ `
         nextToken
         __typename
       }
+      userId
       createdAt
       updatedAt
       __typename
@@ -166,6 +171,7 @@ export const onDeleteDevices = /* GraphQL */ `
         nextToken
         __typename
       }
+      userId
       createdAt
       updatedAt
       __typename
@@ -193,20 +199,8 @@ export const onCreateGasWells = /* GraphQL */ `
         flowMeter
         restrictionSize
         pipeSize
+        userId
         createdAt
-        Services {
-            items {
-              title
-              completedNotes
-              createdAt
-              devicesID
-              id
-              isComplete
-              priority
-              updatedAt
-              servicetypesID
-            }
-          }
         updatedAt
         __typename
       }
@@ -238,20 +232,8 @@ export const onUpdateGasWells = /* GraphQL */ `
         flowMeter
         restrictionSize
         pipeSize
+        userId
         createdAt
-        Services {
-            items {
-              title
-              completedNotes
-              createdAt
-              devicesID
-              id
-              isComplete
-              priority
-              updatedAt
-              servicetypesID
-            }
-          }
         updatedAt
         __typename
       }
@@ -283,8 +265,8 @@ export const onDeleteGasWells = /* GraphQL */ `
         flowMeter
         restrictionSize
         pipeSize
+        userId
         createdAt
-     
         updatedAt
         __typename
       }

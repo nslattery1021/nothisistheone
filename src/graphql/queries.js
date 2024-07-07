@@ -47,6 +47,7 @@ export const getService = /* GraphQL */ `
       priority
       devicesID
       servicetypesID
+      userId
       createdAt
       updatedAt
       __typename
@@ -68,6 +69,7 @@ export const listServices = /* GraphQL */ `
         priority
         devicesID
         servicetypesID
+        userId
         createdAt
         updatedAt
         __typename
@@ -100,6 +102,7 @@ export const servicesByDevicesID = /* GraphQL */ `
         priority
         devicesID
         servicetypesID
+        userId
         createdAt
         updatedAt
         __typename
@@ -132,6 +135,7 @@ export const servicesByServicetypesID = /* GraphQL */ `
         priority
         devicesID
         servicetypesID
+        userId
         createdAt
         updatedAt
         __typename
@@ -158,6 +162,7 @@ export const getDevices = /* GraphQL */ `
         nextToken
         __typename
       }
+      userId
       createdAt
       updatedAt
       __typename
@@ -182,6 +187,7 @@ export const listDevices = /* GraphQL */ `
         flowMeter
         restrictionSize
         pipeSize
+        userId
         createdAt
         updatedAt
         __typename
@@ -217,8 +223,23 @@ export const devicesByLandfillsID = /* GraphQL */ `
         flowMeter
         restrictionSize
         pipeSize
+        userId
         createdAt
         updatedAt
+        Services {
+          items {
+            completedNotes
+            createdAt
+            devicesID
+            id
+            isComplete
+            priority
+            servicetypesID
+            title
+            updatedAt
+            userId
+          }
+        }
         __typename
       }
       nextToken
@@ -247,6 +268,7 @@ export const getGasWells = /* GraphQL */ `
         flowMeter
         restrictionSize
         pipeSize
+        userId
         createdAt
         updatedAt
         __typename
@@ -306,33 +328,6 @@ export const gasWellsByLandfillsID = /* GraphQL */ `
         type
         subtype
         landfillsID
-        Devices {
-          deviceName
-          serialNum
-          macAddress
-          deviceType
-          flowMeter
-          id
-          iccid
-          landfillsID
-          updatedAt
-          restrictionSize
-          pipeSize
-          createdAt
-          Services {
-            items {
-              title
-              completedNotes
-              createdAt
-              devicesID
-              id
-              isComplete
-              priority
-              updatedAt
-              servicetypesID
-            }
-          }
-        }
         createdAt
         updatedAt
         gasWellsDevicesId
@@ -343,6 +338,70 @@ export const gasWellsByLandfillsID = /* GraphQL */ `
     }
   }
 `;
+
+// export const gasWellsByLandfillsID = /* GraphQL */ `
+//   query GasWellsByLandfillsID(
+//     $landfillsID: ID!
+//     $sortDirection: ModelSortDirection
+//     $filter: ModelGasWellsFilterInput
+//     $limit: Int
+//     $nextToken: String
+//   ) {
+//     gasWellsByLandfillsID(
+//       landfillsID: $landfillsID
+//       sortDirection: $sortDirection
+//       filter: $filter
+//       limit: $limit
+//       nextToken: $nextToken
+//     ) {
+//       items {
+//         id
+//         gasWellName
+//         lat
+//         lng
+//         type
+//         subtype
+//         landfillsID
+//         Devices {
+//           deviceName
+//           serialNum
+//           macAddress
+//           deviceType
+//           flowMeter
+//           id
+//           iccid
+//           landfillsID
+//           updatedAt
+//           restrictionSize
+//           pipeSize
+//           userId
+//           createdAt
+//           Services {
+//             items {
+//               title
+//               completedNotes
+//               createdAt
+//               devicesID
+//               id
+//               userId
+//               isComplete
+//               priority
+//               updatedAt
+//               servicetypesID
+//             }
+//           }
+//         }
+//         createdAt
+//         updatedAt
+//         gasWellsDevicesId
+//         __typename
+//       }
+//       nextToken
+//       __typename
+//     }
+//   }
+// `;
+
 export const getLandfills = /* GraphQL */ `
   query GetLandfills($id: ID!) {
     getLandfills(id: $id) {

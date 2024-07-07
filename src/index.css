@@ -201,6 +201,40 @@ div.no-border div input {
       content: none;
 }
 
+.tech {
+height: 41px;
+border-bottom: 1px solid #C0C0C0;
+line-height: 41px;
+position: relative;
+}
+
+.category {
+    height: 41px;
+    border-bottom: 2px solid #C0C0C0;
+    line-height: 41px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.eachTimeSlot{
+    width: 60px!important;
+    display: inline-block;
+    height: 41px;
+  }
+  .eachTimeSlot:hover{
+    background: #6dffff;
+    opacity: 0.4;
+}
+
+.timeslot {
+    height: 41px;
+    width: 120px;
+  color: #C0C0C0;
+  border-bottom: 1px solid #C0C0C0;
+  line-height: 41px;
+
+}
+
 :root {
   --apis-light-blue-50: #effbff;
   --apis-light-blue-100: #def6ff;

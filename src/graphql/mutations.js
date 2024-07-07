@@ -71,6 +71,7 @@ export const createService = /* GraphQL */ `
       priority
       devicesID
       servicetypesID
+      userId
       createdAt
       updatedAt
       __typename
@@ -90,6 +91,7 @@ export const updateService = /* GraphQL */ `
       priority
       devicesID
       servicetypesID
+      userId
       createdAt
       updatedAt
       __typename
@@ -109,6 +111,7 @@ export const deleteService = /* GraphQL */ `
       priority
       devicesID
       servicetypesID
+      userId
       createdAt
       updatedAt
       __typename
@@ -135,6 +138,7 @@ export const createDevices = /* GraphQL */ `
         nextToken
         __typename
       }
+      userId
       createdAt
       updatedAt
       __typename
@@ -161,6 +165,7 @@ export const updateDevices = /* GraphQL */ `
         nextToken
         __typename
       }
+      userId
       createdAt
       updatedAt
       __typename
@@ -187,6 +192,7 @@ export const deleteDevices = /* GraphQL */ `
         nextToken
         __typename
       }
+      userId
       createdAt
       updatedAt
       __typename
@@ -217,6 +223,7 @@ export const createGasWells = /* GraphQL */ `
         flowMeter
         restrictionSize
         pipeSize
+        userId
         createdAt
         updatedAt
         __typename
@@ -252,6 +259,7 @@ export const updateGasWells = /* GraphQL */ `
         flowMeter
         restrictionSize
         pipeSize
+        userId
         createdAt
         updatedAt
         __typename
@@ -287,6 +295,7 @@ export const deleteGasWells = /* GraphQL */ `
         flowMeter
         restrictionSize
         pipeSize
+        userId
         createdAt
         updatedAt
         __typename

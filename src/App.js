@@ -1,26 +1,87 @@
 // src/App.js
 import React from 'react';
-import { withAuthenticator } from '@aws-amplify/ui-react';
+// import { withAuthenticator } from '@aws-amplify/ui-react';
+import { getCurrentUser } from 'aws-amplify/auth';
+import { Authenticator } from '@aws-amplify/ui-react';
+
 import '@aws-amplify/ui-react/styles.css';
+import '@mantine/dates/styles.css';
 import { Image, Tabs, rem } from '@mantine/core';
 import { Routes, Route, Outlet, Link } from "react-router-dom";
 import { useNavigate, useParams } from 'react-router-dom';
 import { IconBuildingFactory, IconCalendarMonth, IconFileDescription, IconPackages, IconInfoSquareRounded, IconMessageCircle, IconSettings } from '@tabler/icons-react';
-
+import {I18n} from 'aws-amplify/utils'
 import Home from './Home'; // Ensure correct import path
 import Inventory from './Inventory'; // Ensure correct import path
 import LandfillMapList from './LandfillMapList'; // Ensure correct import path
 import LandfillMap from './LandfillMap'; // Ensure correct import path
+import NewMap from './NewMap'; // Ensure correct import path
 import LandfillProfiles from './LandfillProfiles'; // Ensure correct import path
 import Settings from './Settings'; // Ensure correct import path
 import ExampleComponent from './ExampleComponent'; // Ensure correct import path
+import Dispatch from './Dispatch';
+const components = {
+  Header() {
+    return (
+      <div style={{textAlign:"center", padding:'1rem'}}>
+        <Image
+        height={200}
+        width={200}
+        fit="contain"
+          alt="Apis logo"
+          src="/APISlogo.png"
+        />
+      </div>
+    );
+  },
+}
+const formFields = {
+  signUp: {
+    email: {
+      order: 1
+    },
+    password: {
+      order: 2
+    },
+    confirm_password: {
+      order: 3
+    },
+    family_name: {
+      label: 'Last Name',
+      placeholder: 'Enter your last name',
+      order: 5
+    },
+    given_name: {
+      label: 'First Name',
+      placeholder: 'Enter your first name',
+      order: 4
+    }
+  }
+}
 
+I18n.putVocabulariesForLanguage('en', {
+  'Sign In' : 'Login',
+  'Sign in' : 'Log in',
+})
+ 
 const App = () => {
 
-
+  // currentAuthenticatedUser();
+  
 
   return (
-    <div>
+    <Authenticator hideSignUp formFields={formFields} components={components} signUpAttributes={[
+      'address',
+      'birthdate',
+      'email',
+      'family_name',
+      'given_name',
+      'locale',
+      'phone_number',
+      'picture',
+      'updated_at',
+      'zoneinfo',
+    ]}>
     {/* Routes nest inside one another. Nested route paths build upon
           parent route paths, and nested route elements render inside
           parent route elements. See the note about <Outlet> below. */}
@@ -31,7 +92,9 @@ const App = () => {
         <Route path="/settings" element={<Settings />} />
         <Route path="/example" element={<ExampleComponent />} />
         <Route path="/inventory" element={<Inventory />} />
+        <Route path="/dispatch" element={<Dispatch />} />
         <Route path="/landfill/:id" element={<LandfillMap />} />
+        {/* <Route path="/landfill/:id" element={<NewMap />} /> */}
         <Route path="/profile/:id" element={<LandfillProfiles />} />
 
         {/* Using path="*"" means "match anything", so this route
@@ -39,7 +102,8 @@ const App = () => {
               routes for. */}
         <Route path="*" element={<NoMatch />} />
       </Route>
-    </Routes></div>
+    </Routes>
+    </Authenticator>
   );
 };
 function Layout() {
@@ -105,8 +169,26 @@ function NoMatch() {
     </div>
   );
 }
-const customAuthenticator = withAuthenticator(App, {
-  hideSignUp: true
-});
+// const customAuthenticator = withAuthenticator(App, {
+//   hideSignUp: false, // Change to true if you want to hide sign-up
+//   components: {
+//     SignIn: {
+//       Header() {
+//         return <div className="authenticator-container">Sign in to your account</div>;
+//       },
+//       Footer() {
+//         return <div className="authenticator-container">Footer content</div>;
+//       },
+//     },
+//     SignUp: {
+//       Header() {
+//         return <div className="authenticator-container">Create a new account</div>;
+//       },
+//       Footer() {
+//         return <div className="authenticator-container">Footer content</div>;
+//       },
+//     },
+//   },
+// });
 
-export default customAuthenticator;
+export default App;

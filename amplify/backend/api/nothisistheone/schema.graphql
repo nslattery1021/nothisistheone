@@ -13,6 +13,7 @@ type Service @model @auth(rules: [{allow: public}]) {
   priority: String
   devicesID: ID! @index(name: "byDevices")
   servicetypesID: ID! @index(name: "byServiceTypes")
+  userId: ID
 }
 
 type Devices @model @auth(rules: [{allow: public}]) {
@@ -27,6 +28,7 @@ type Devices @model @auth(rules: [{allow: public}]) {
   restrictionSize: Float
   pipeSize: Float
   Services: [Service] @hasMany(indexName: "byDevices", fields: ["id"])
+  userId: ID
 }
 
 type GasWells @model @auth(rules: [{allow: public}]) {

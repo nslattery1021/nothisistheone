@@ -2,14 +2,15 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/api';
 import { useDisclosure } from '@mantine/hooks';
-import { ActionIcon, Accordion, Divider, Drawer, Button, Group, Modal, Timeline, Text, Loader, Center, Menu, rem } from '@mantine/core';
+import { ActionIcon, Accordion, Flex, Badge, Divider, Drawer, Button, Group, Modal, Timeline, Text, Loader, Center, Menu, rem } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconDots, IconGaugeFilled, IconListDetails, IconTool, IconCheck } from '@tabler/icons-react';
 import moment from 'moment';
 
-import { getLandfills, getGasWells, gasWellsByLandfillsID, listServiceTypes } from './graphql/queries';
+import { getLandfills, gasWellsByLandfillsID, listServiceTypes, devicesByLandfillsID, servicesByDevicesID } from './graphql/queries';
 import { createGasWells, updateGasWells, createService, updateService, deleteService } from './graphql/mutations';
-import { onCreateGasWells, onUpdateGasWells, onDeleteGasWells } from './graphql/subscriptions';
+import { onCreateGasWells, onUpdateGasWells, onDeleteGasWells, onCreateService, onUpdateService, onDeleteService } from './graphql/subscriptions';
+import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 
 import AddGasWell from './AddGasWell';
 import InstallationModal from './InstallationModal';
@@ -19,6 +20,17 @@ import Filters from './Filters'; // Ensure correct import path
 
 import { Icon } from 'semantic-ui-react';
 
+async function currentAuthenticatedUser() {
+  try {
+    const { username, userId, signInDetails } = await getCurrentUser();
+   
+    return userId;
+    
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
 
 const LandfillMap = () => {
   const { id } = useParams();
@@ -38,13 +50,29 @@ const LandfillMap = () => {
     'Above Surface','Subsurface','Riser','2" Well' ,'3" Well' 
   ]);
   const [selectedPriorities, setSelectedPriorities] = useState([]);
+  const [devices, setDevices] = useState([]);
+  const [services, setServices] = useState({});
 
-  const filteredGasWells = gasWells.filter(well => selectedSubtypes.includes(well.subtype));
+  const filteredGasWells = gasWells
+  .filter(well => selectedSubtypes.includes(well.subtype))
+  .filter(function(well) {
+    if(selectedPriorities.length == 0){
+      return well;
+    } else {
+      if(devices[well.gasWellsDevicesId]?.Services?.items.length > 0){
+        if(devices[well.gasWellsDevicesId]?.Services?.items.some(serv => selectedPriorities.includes(serv.priority))){
+          return well;
+        }
+        // console.log(devices[well.gasWellsDevicesId]?.Services?.items.some(serv => selectedPriorities.includes(serv.priority)))
+        
+      }
+    }
+    
+  });
 
   const handleButtonClick = (content) => {
+    console.log("Gas Well Test",selectedGasWell)
     setDrawerContent(content);
-    console.log(selectedGasWell)
-
     open()
   };
 
@@ -69,7 +97,7 @@ const LandfillMap = () => {
         const gasWells = gasWellsData.data.gasWellsByLandfillsID.items;
 
         setGasWells(gasWells);
-
+        fetchDevices();
       } catch (error) {
         console.error('Error fetching gaswells:', error);
       }
@@ -84,7 +112,6 @@ const LandfillMap = () => {
         const allServiceTypes = serviceTypeData.data.listServiceTypes.items.map(servType => ({ "value": servType.id, "label": servType.name, ...servType }))
 
         setServiceTypes(allServiceTypes);
-console.log(allServiceTypes)
         
       } catch (error) {
         console.error('Error fetching gaswells:', error);
@@ -133,17 +160,97 @@ console.log(allServiceTypes)
         );
       }
     });
+
+    const createServiceSub = client.graphql({
+      query: onCreateService,
+  }).subscribe({
+    next: (eventData) => {
+      console.log('eventData',eventData)
+      const newService = eventData.data.onCreateService;
+      updateServices(newService, 'create');
+    }
+  });
+ 
+  const updateServiceSub = client.graphql({
+      query: onUpdateService,
+  }).subscribe({
+    next: (eventData) => {
+      console.log('eventData',eventData)
+
+      const updatedService = eventData.data.onUpdateService;
+      updateServices(updatedService, 'update');
+    }
+  });
+
+  const deleteServiceSub = client.graphql({
+      query: onDeleteService,
+  }).subscribe({
+    next: (eventData) => {
+      const deletedService = eventData.data.onDeleteService;
+      updateServices(deletedService, 'delete');
+    }
+  });
+
+  return () => {
+    createSub.unsubscribe();
+    updateSub.unsubscribe();
+    deleteSub.unsubscribe();
+    createServiceSub.unsubscribe();
+    updateServiceSub.unsubscribe();
+    deleteServiceSub.unsubscribe();
+  };
+}, [id]);
+
+  const fetchDevices = async () => {
+    try {
+        const deviceData = await client.graphql({
+            query: devicesByLandfillsID,
+            variables: { landfillsID: id }
+        });
+        console.log("Devices",deviceData.data.devicesByLandfillsID.items)
+        let newDeviceArray = deviceData.data.devicesByLandfillsID.items.reduce((acc, obj) => {
+          acc[obj.id] = obj;
+          return acc;
+        }, {});
+        console.log("New Devices",newDeviceArray)
+        
+        setDevices(newDeviceArray);
+      } catch (err) {
+        console.error('Error fetching devices:', err);
+      }
+   
+  };
+
+  const updateServices = (service, action) => {
+
+    setDevices(prevServices => {
+      const updatedServices = { ...prevServices };
+      switch (action) {
+        case 'create':
+          if (!updatedServices[service.devicesID].Services.items) {
+            updatedServices[service.devicesID].Services.items = [];
+          }
+          updatedServices[service.devicesID].Services.items.push(service);
+          break;
+        case 'update':
+          updatedServices[service.devicesID].Services.items = updatedServices[service.devicesID].Services.items.map(s => s.id === service.id ? service : s);
+          break;
+        case 'delete':
+          updatedServices[service.devicesID].Services.items = updatedServices[service.devicesID].Services.items.filter(s => s.id !== service.id);
+          break;
+        default:
+          break;
+      }
+      return updatedServices;
+    });
+  };
+   
   
-  
-    return () => {
-      createSub.unsubscribe();
-      updateSub.unsubscribe();
-      deleteSub.unsubscribe();
-    };
-  }, [id]);
 
   const handleGasWellSelect = (gasWellId) => {
-    setSelectedGasWell(gasWellId);
+    console.log('selected properly',gasWellId.id)
+
+    setSelectedGasWell(gasWells.find(gw => gw.id == gasWellId.id));
   };
 
   if (!landfill) {
@@ -151,11 +258,14 @@ console.log(allServiceTypes)
   }
 
   const ServiceList = ({ selectedGasWell, isComplete }) => {
-    if (!selectedGasWell || !selectedGasWell.Devices.Services) {
+    console.log(selectedGasWell, isComplete)
+    if (!selectedGasWell || !devices[selectedGasWell.gasWellsDevicesId].Services) {
         return <p>No gas well selected or no services available.</p>;
       }
     
-      const allServices = selectedGasWell?.Devices?.Services.items
+
+      // console.log(devices[selectedGasWell.gasWellsDevicesId]?.Services.items)
+      const allServices = devices[selectedGasWell.gasWellsDevicesId]?.Services.items
       .filter(serv => serv.isComplete == isComplete)
       .sort((a, b) => moment(b.createdAt) - moment(a.createdAt));
 
@@ -164,26 +274,45 @@ console.log(allServiceTypes)
         <div>
           
           {allServices.length > 0 ? (
- 
-            <Timeline bulletSize={32} lineWidth={3} style={{cursor: 'pointer'}}>
+              <Flex 
+              gap="sm"
+              direction="column">
               {allServices.map(service => (
-                    <Timeline.Item 
-                    onClick={() => {
-                      setSelectedDevice(selectedGasWell.Devices); 
+              
+                  <Flex 
+                  gap="md"
+                  justify="flex-start"
+                  align="flex-start"
+                  direction="row"
+                  key={service.id}
+                  style={{cursor: 'pointer'}}
+                  onClick={() => {
+                      setSelectedDevice(devices[selectedGasWell.gasWellsDevicesId]); 
                       setSelectedService(service); 
                       handleOpeningModal({modalName: 'serviceRequest', modalTitle: 'Edit Service Request'});
-                      }}
-                    key={service.id}
-                    lineActive={true} 
-                    active={true} 
-                    color={`var(--apis-${service.priority == "High" ? 'red' : (service.priority == "Medium" ? 'orange' : 'yellow')}-200)` } 
-                    bullet={<IconTool color={`var(--apis-${service.priority == "High" ? 'red' : (service.priority == "Medium" ? 'orange' : 'yellow')}-500)`} size={16} />} 
-                    title={service.title}>
-                      <Text color="dimmed" size="xs">Added by {moment(service.createdAt).format('l h:mm a')}</Text>
-                    </Timeline.Item>
+                    }}>
+                      <Badge
+                      color={`var(--apis-${service.priority == "High" ? 'red' : (service.priority == "Medium" ? 'orange' : 'yellow')}-500)` }>{service.priority == "Medium" ? "Med" : service.priority}</Badge>
+                      <div>
+                      <Text style={{lineHeight: '1'}}>{service.title}</Text>
+                      <Text color="dimmed" size="xs">{service.userId ? `Added by ${service.userId} ` : ``}at {moment(service.createdAt).format('l h:mm a')}</Text>
+                      </div>
+                    </Flex>
+                 
+                    // <Timeline.Item 
+                    
+                    // key={service.id}
+                    // lineActive={true} 
+                    // active={true}
+                    // radius='sm' 
+                    // color={`var(--apis-${service.priority == "High" ? 'red' : (service.priority == "Medium" ? 'orange' : 'yellow')}-500)` } 
+                    // // bullet={<IconTool color={`var(--apis-${service.priority == "High" ? 'red' : (service.priority == "Medium" ? 'orange' : 'yellow')}-500)`} size={16} />} 
+                    // bullet={<Text size="xs" style={{fontWeight: '700'}} >{service.priority == "Medium" ? "Med" : service.priority}</Text>} 
+                    // title={service.title}>
+                    //   <Text color="dimmed" size="xs">Added by {moment(service.createdAt).format('l h:mm a')}</Text>
+                    // </Timeline.Item>
               ))}
-            
-          </Timeline>
+             </Flex>
           ) : (
             <p style={{color: 'var(--apis-gray-700)', fontSize: '0.85rem'}}>No {status} services found.</p>
           )}
@@ -193,7 +322,6 @@ console.log(allServiceTypes)
 
 
 const deleteServiceRequest = async (service) => {
-  console.log(service)
 
   if(window.confirm('Are you sure you want to delete this service request?')){
 
@@ -222,23 +350,24 @@ notifications.show({
 }
 }
 const handleService = async (newService) => {
-  console.log(newService);
-
+  const userId = await currentAuthenticatedUser();
+console.log('userId',userId)
   const isEdit = !!newService.id;
   const query = isEdit ? updateService : createService;
   const variables = {
     input: {
-      id: newService.id, // Only include id if it's an edit
+      ...(isEdit && { id: newService.id }), // Only include id if it's an edit
       title: newService.title,
       completedNotes: newService.completedNotes ?? "", // Make sure to handle notes if present
       isComplete: newService.isComplete ?? false,
       priority: newService.priority,
       devicesID: newService.devicesID,
-      servicetypesID: newService.servicetypesID
+      servicetypesID: newService.servicetypesID,
+      ...(!isEdit && { userId: userId }),
+      
     }
   };
-  console.log(newService);
-  console.log("Edit?",isEdit);
+ 
 
   try {
     const result = await client.graphql({ query: query, variables: variables });
@@ -264,8 +393,6 @@ const handleService = async (newService) => {
 
 
 const handleAddGasWell = async (newGasWell) => {
-
-  console.log(newGasWell)
   try {
     const result = await client.graphql({
       query: createGasWells,
@@ -291,14 +418,12 @@ const handleAddGasWell = async (newGasWell) => {
 
 const handleEditGasWell = async (newGasWell) => {
 
-  console.log(newGasWell)
   try {
     const result = await client.graphql({
       query: updateGasWells,
       variables: { input: newGasWell }
     });
 
-console.log("RESULT",result)
 
 notifications.show({
   id: 'success-updating-gas-wells',
@@ -355,7 +480,6 @@ const renderModals = () => {
 
 const handleOpeningModal = ({ modalName, modalTitle }) => {
 
-    console.log(modalName,modalTitle)
 
   setActiveContent(modalName); 
   setActiveContentTitle(modalTitle); 
@@ -369,16 +493,11 @@ const handleOpeningModal = ({ modalName, modalTitle }) => {
   </Modal>
  
   <div>
-      <Drawer zIndex={9} size={isMobile ? "80%" : "30%"} position="right" opened={opened} onClose={close} >
-      {selectedGasWell && selectedGasWell.Devices && (
+      <Drawer zIndex={9} size={isMobile ? "80%" : "30%"} position="right" title="Service Requests for" opened={opened} onClose={close} >
+      {selectedGasWell && devices[selectedGasWell.gasWellsDevicesId] && (
           <div>
-            <div key={selectedGasWell.Devices.id}>
-                <div style={{
-                  fontSize: '24px',
-                  marginBottom: '1rem'
-                }}>
-                    Service Request for
-                </div>
+            <div key={selectedGasWell.gasWellsDevicesId}>
+                
                 <div style={{
                   fontSize: '18px'
                 }}>
@@ -388,14 +507,14 @@ const handleOpeningModal = ({ modalName, modalTitle }) => {
                   fontSize: '14px',
                   color: 'gray'
                 }}>
-                    {selectedGasWell.Devices.serialNum}
+                    {devices[selectedGasWell.gasWellsDevicesId].serialNum}
                 </div>
             </div>
             <Divider style={{ margin: '1rem 0'}}/>
             <Group justify="flex-end">
               <Button 
               onClick={() => {
-                setSelectedDevice(selectedGasWell.Devices); 
+                setSelectedDevice(devices[selectedGasWell.gasWellsDevicesId]); 
                 setSelectedService(null); 
                 handleOpeningModal({modalName: 'serviceRequest', modalTitle: 'Add Service Request'});
                 }}>Add Service Request</Button>
@@ -481,6 +600,7 @@ const handleOpeningModal = ({ modalName, modalTitle }) => {
           lng={landfill.lng} 
           landfillId={id}
           gasWells={filteredGasWells}
+          allDevices={devices}
           setModalWindow={handleOpeningModal}
           />
         </div>

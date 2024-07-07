@@ -8,22 +8,18 @@ const AddGasWellForm = ({ onSubmit, landfillsID, gasWell }) => {
   const [lng, setLng] = useState(gasWell?.lng ?? '');
   const [type, setType] = useState(gasWell?.type ?? '');
   const [subtype, setSubtype] = useState(gasWell?.subtype ?? '');
+  const [restrictionSize, setRestrictionSize] = useState('');
   const [id, setId] = useState(gasWell?.id ?? '');
   const [userLocation, setUserLocation] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const typeOptions = [
-    { value: 'Header Monitor', label: 'Header Monitor' },
-    { value: 'Smart Well', label: 'Smart Well' },
-  ];
-
   const getUserLocation = () => {
     // if geolocation is supported by the users browser
-if(lat && lng){
-  if(!window.confirm("Would you like to update the location?")){
-    return;
-  }
-}
+    if(lat && lng){
+      if(!window.confirm("Would you like to update the location?")){
+        return;
+      }
+    }
 
     if (navigator.geolocation) {
       // get the current users location
@@ -57,6 +53,10 @@ if(lat && lng){
       console.error('Geolocation is not supported by this browser.');
     }
   };
+  const typeOptions = [
+    { value: 'Header Monitor', label: 'Header Monitor' },
+    { value: 'Smart Well', label: 'Smart Well' },
+  ];
 
   const subtypeOptions = {
     'Header Monitor': [
@@ -70,12 +70,72 @@ if(lat && lng){
     ],
   };
 
+  const restrictionSizeOptions = {
+    '2" Well' : [
+      { value: 'Normal (1.1" ID)', label: 'Normal (1.1" ID)' },
+      { value: 'High Flow (1.4" ID)', label: 'High Flow (1.4" ID)' },
+    ],
+    '3" Well' : [
+      { value: 'Normal (1.8" ID)', label: 'Normal (1.8" ID)' },
+      { value: 'High Flow (2.1" ID)', label: 'High Flow (2.1" ID)' },
+    ],
+    'Above Surface' : [
+      { value: '5.85', label: '6" (5.85" ID)' },
+      { value: '7.61', label: '8" (7.61" ID)' },
+      { value: '9.49', label: '10" (9.49" ID)' },
+      { value: '11.25', label: '12" (11.25" ID)' },
+      { value: '12.35', label: '14" (12.35" ID)' },
+      { value: '14.12', label: '16" (14.12" ID)' },
+      { value: '15.88', label: '18" (15.88" ID)' },
+      { value: '17.65', label: '20" (17.65" ID)' },
+      { value: '21.18', label: '24" (21.18" ID)' },
+      { value: '26.47', label: '30" (26.47" ID)' },
+      { value: '31.76', label: '36" (31.76" ID)' }
+    ],
+    'Subsurface' : [
+      { value: '5.85', label: '6" (5.85" ID)' },
+      { value: '7.61', label: '8" (7.61" ID)' },
+      { value: '9.49', label: '10" (9.49" ID)' },
+      { value: '11.25', label: '12" (11.25" ID)' },
+      { value: '12.35', label: '14" (12.35" ID)' },
+      { value: '14.12', label: '16" (14.12" ID)' },
+      { value: '15.88', label: '18" (15.88" ID)' },
+      { value: '17.65', label: '20" (17.65" ID)' },
+      { value: '21.18', label: '24" (21.18" ID)' },
+      { value: '26.47', label: '30" (26.47" ID)' },
+      { value: '31.76', label: '36" (31.76" ID)' }
+    ],
+    'Riser' : [
+      { value: '5.85', label: '6" (5.85" ID)' },
+      { value: '7.61', label: '8" (7.61" ID)' },
+      { value: '9.49', label: '10" (9.49" ID)' },
+      { value: '11.25', label: '12" (11.25" ID)' },
+      { value: '12.35', label: '14" (12.35" ID)' },
+      { value: '14.12', label: '16" (14.12" ID)' },
+      { value: '15.88', label: '18" (15.88" ID)' },
+      { value: '17.65', label: '20" (17.65" ID)' },
+      { value: '21.18', label: '24" (21.18" ID)' },
+      { value: '26.47', label: '30" (26.47" ID)' },
+      { value: '31.76', label: '36" (31.76" ID)' }
+    ],
+  };
+
   useEffect(() => {
     // Only reset subtype if type is changed to a different value
     if (type && !subtypeOptions[type].some(option => option.value === subtype)) {
+      console.log("changed")
       setSubtype('');
+      setRestrictionSize('');
+      // console.log('subtype',subtype)
     }
-  }, [type, subtype]);
+    // if (subtype) {
+
+    //   if (!restrictionSizeOptions[subtype].some(option => option.value === restrictionSize)) {
+    //     setRestrictionSize('');
+    //   }
+      
+    // }
+  }, [type, subtype, restrictionSize]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -98,6 +158,7 @@ if(lat && lng){
           onChange={(e) => setGasWellName(e.target.value)}
           required
         />
+        <Group grow>
         <NumberInput
           label="Latitude"
           value={lat}
@@ -112,7 +173,9 @@ if(lat && lng){
           required
           precision={6}
         />
-        <Button style={{margin: '0.5rem 0'}} leftSection={<IconMapPinFilled size={14} />} disabled={loading} onClick={getUserLocation}>{loading ? <Loader  color="blue" size="xs" /> : 'Get Location'}</Button>
+        </Group>
+        
+        <Button style={{margin: '1rem 0 0.5rem 0'}} leftSection={<IconMapPinFilled size={14} />} disabled={loading} onClick={getUserLocation}>{loading ? <Loader  color="blue" size="xs" /> : 'Get Location'}</Button>
         <Select
           label="Type"
           value={type}
@@ -124,8 +187,16 @@ if(lat && lng){
           label="Subtype"
           value={subtype}
           onChange={(value) => setSubtype(value)}
-          data={type ? subtypeOptions[type] : []}
           disabled={!type && !subtype}
+          data={type ? subtypeOptions[type] : []}
+          required
+        />
+        <Select
+          label="Restriction Size"
+          value={restrictionSize}
+          onChange={(value) => setRestrictionSize(value)}
+          disabled={!type && !subtype && !restrictionSize}
+          data={subtype ? restrictionSizeOptions[subtype] : []}
           required
         />
         <Group position="right" mt="md">

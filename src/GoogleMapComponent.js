@@ -6,7 +6,7 @@ import { Autocomplete, Menu, Modal, Divider, ActionIcon, Select, SelectProps, re
 import { useDisclosure } from '@mantine/hooks';
 import MarkerWithInfoWindow from './MarkerWithInfoWindow';
 
-const MyComponent = ({ gasWells, openDrawer, setSelectedGasWellId, handleGasWellSelect, setModalWindow }) => {
+const MapMenuOptions = ({ gasWells, openDrawer, selectingGasWellId, handleGasWellSelect, setModalWindow }) => {
   const map = useMap('main-map');
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -53,23 +53,13 @@ const MyComponent = ({ gasWells, openDrawer, setSelectedGasWellId, handleGasWell
     </div>
   );
 
-
-
-  // const handleWellSelect = (wellName) => {
-  //   const well = gasWellTitles.find((item) => item.value === wellName);
-  //   if (map && well) {
-  //     map.panTo(well.center);
-  //     map.setZoom(19); // Set the desired zoom level
-  //     setSelectedGasWellId(well.id);
-  //     handleGasWellSelect(well);
-  //   }
-  // };
   const handleWellSelect = useCallback((wellName) => {
     const well = gasWellTitles.find((item) => item.value === wellName);
+    console.log("Well Search",well)
     if (map && well) {
       map.panTo(well.center);
       map.setZoom(19); // Set the desired zoom level
-      setSelectedGasWellId(well.id);
+      selectingGasWellId(well.id);
       handleGasWellSelect(well);
     }
   }, [handleGasWellSelect]);
@@ -109,7 +99,7 @@ renderOption={renderSelectOption}
 </>;
 };
 
-const GoogleMapComponent = ({ openDrawer, handleGasWellSelect, lat, lng, gasWells, setModalWindow }) => {
+const GoogleMapComponent = ({ openDrawer, handleGasWellSelect, lat, lng, gasWells, allDevices, setModalWindow }) => {
     
   const [markerRef, marker] = useMarkerRef();
   const [selectedGasWellId, setSelectedGasWellId] = useState(null);
@@ -120,6 +110,7 @@ const GoogleMapComponent = ({ openDrawer, handleGasWellSelect, lat, lng, gasWell
       }
     }, [marker]);
     const handleMarkerClick = useCallback((well) => {
+      console.log("Does it come here")
       setSelectedGasWellId(prevId => (prevId === well.id ? null : well.id));
       handleGasWellSelect(well);
     }, [handleGasWellSelect]);
@@ -127,7 +118,7 @@ const GoogleMapComponent = ({ openDrawer, handleGasWellSelect, lat, lng, gasWell
         lat: parseFloat(lat),
         lng: parseFloat(lng)
     };
-    console.log("GASWELLS",gasWells)
+    // console.log("GASWELLS",gasWells)
     return (
         <APIProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
             
@@ -151,13 +142,14 @@ const GoogleMapComponent = ({ openDrawer, handleGasWellSelect, lat, lng, gasWell
                 openDrawer={openDrawer} 
                 key={well.id} 
                 props={well}
+                allDevices={allDevices}
                 setModalWindow={setModalWindow} />
             ))}
         </Map>
-        <MyComponent 
+        <MapMenuOptions 
         gasWells={gasWells} 
         openDrawer={openDrawer} 
-        setSelectedGasWellId={setSelectedGasWellId} 
+        selectingGasWellId={setSelectedGasWellId} 
         handleGasWellSelect={handleGasWellSelect} 
         setModalWindow={setModalWindow} />
       </APIProvider>
