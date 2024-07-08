@@ -149,7 +149,7 @@ const MarkerWithInfoWindow = ({ props, allDevices, isSelected, onClick, openDraw
               <div style={{fontSize: '0.85rem'}}>{props.type} • {props.subtype}</div>
               <div style={{display: 'flex', marginTop: '0.5rem', gap: '0.35rem', flexWrap: 'wrap'}}>
               
-              <Group justify="center">
+              {/* <Group justify="center">
                 <HoverCard shadow="md">
                   <HoverCard.Target>
                   <div><Label><Icon name='tachometer alternate' /> 23</Label></div>
@@ -222,7 +222,7 @@ const MarkerWithInfoWindow = ({ props, allDevices, isSelected, onClick, openDraw
                   </HoverCard.Dropdown>
                 </HoverCard>
               </Group>
-                <div><Label color='green'><Icon name='tint' />Pump</Label></div>
+                <div><Label color='green'><Icon name='tint' />Pump</Label></div> */}
               </div>
             </div>
           </div>
