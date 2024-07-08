@@ -167,7 +167,9 @@ const LandfillMap = () => {
     next: (eventData) => {
       console.log('eventData',eventData)
       const newService = eventData.data.onCreateService;
-      updateServices(newService, 'create');
+      if(Object.keys(devices).includes(newService.devicesID)){
+        updateServices(newService, 'create');
+      }
     }
   });
  
@@ -176,9 +178,11 @@ const LandfillMap = () => {
   }).subscribe({
     next: (eventData) => {
       console.log('eventData',eventData)
-
       const updatedService = eventData.data.onUpdateService;
-      updateServices(updatedService, 'update');
+
+      if(Object.keys(devices).includes(updatedService.devicesID)){
+        updateServices(updatedService, 'update');
+      }
     }
   });
 
@@ -187,7 +191,9 @@ const LandfillMap = () => {
   }).subscribe({
     next: (eventData) => {
       const deletedService = eventData.data.onDeleteService;
-      updateServices(deletedService, 'delete');
+      if(Object.keys(devices).includes(deletedService.devicesID)){
+        updateServices(deletedService, 'delete');
+      }
     }
   });
 
@@ -215,6 +221,7 @@ const LandfillMap = () => {
         console.log("New Devices",newDeviceArray)
         
         setDevices(newDeviceArray);
+        console.log(Object.keys(newDeviceArray))
       } catch (err) {
         console.error('Error fetching devices:', err);
       }
@@ -225,21 +232,25 @@ const LandfillMap = () => {
 
     setDevices(prevServices => {
       const updatedServices = { ...prevServices };
-      switch (action) {
-        case 'create':
-          if (!updatedServices[service.devicesID].Services.items) {
-            updatedServices[service.devicesID].Services.items = [];
-          }
-          updatedServices[service.devicesID].Services.items.push(service);
-          break;
-        case 'update':
-          updatedServices[service.devicesID].Services.items = updatedServices[service.devicesID].Services.items.map(s => s.id === service.id ? service : s);
-          break;
-        case 'delete':
-          updatedServices[service.devicesID].Services.items = updatedServices[service.devicesID].Services.items.filter(s => s.id !== service.id);
-          break;
-        default:
-          break;
+      if(updatedServices[service.devicesID]){
+        switch (action) {
+          case 'create':
+            if (!updatedServices[service.devicesID].Services.items) {
+              updatedServices[service.devicesID].Services.items = [];
+            }
+            updatedServices[service.devicesID].Services.items.push(service);
+            break;
+          case 'update':
+            updatedServices[service.devicesID].Services.items = updatedServices[service.devicesID].Services.items.map(s => s.id === service.id ? service : s);
+            break;
+          case 'delete':
+            updatedServices[service.devicesID].Services.items = updatedServices[service.devicesID].Services.items.filter(s => s.id !== service.id);
+            break;
+          default:
+            break;
+        }
+      } else {
+        console.log('Service request from another landfill')
       }
       return updatedServices;
     });
