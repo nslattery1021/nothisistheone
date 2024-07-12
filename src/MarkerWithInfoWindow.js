@@ -142,8 +142,8 @@ const MarkerWithInfoWindow = ({ props, allDevices, isSelected, onClick, openDraw
               </h3>
               {hasDevice && 
                     <>
-                      <div style={{fontSize: '0.85rem'}}>{linkedDevice.serialNum}</div>
-                      <div style={{fontSize: '0.85rem'}}>{linkedDevice.deviceName}</div>
+                      <div style={{fontSize: '0.85rem'}}>{linkedDevice?.serialNum ?? '-'}</div>
+                      <div style={{fontSize: '0.85rem'}}>{linkedDevice?.deviceName ?? '-'}</div>
                     </>
                   }
               <div style={{fontSize: '0.85rem'}}>{props.type} • {props.subtype}</div>

@@ -15,7 +15,7 @@ const InstallationModal = ({ landfillsID, gasWell }) => {
     const [search, setSearch] = useState('');
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedItemLabel, setSelectedItemLabel] = useState(null);
-    
+    const limit = 150;
     const combobox = useCombobox({
       onDropdownClose: () => {
         combobox.resetSelectedOption();
@@ -74,7 +74,7 @@ const InstallationModal = ({ landfillsID, gasWell }) => {
  console.log(gasWell)
           const deviceData = await client.graphql({
             query: devicesByLandfillsID,
-            variables: { landfillsID: landfillsID },
+            variables: { landfillsID: landfillsID, limit },
           });
           setDevices(deviceData.data.devicesByLandfillsID.items.filter(dev => dev.deviceType == gasWell.type));
           gasWell.gasWellsDevicesId && setSelectedItem(gasWell.gasWellsDevicesId);

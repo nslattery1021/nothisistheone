@@ -4,17 +4,19 @@ import { generateClient } from 'aws-amplify/api';
 import { notifications } from '@mantine/notifications';
 import { useDisclosure } from '@mantine/hooks';
 import {
-  Accordion, Divider, Skeleton, Button, Modal, Flex, ActionIcon, Menu, Center, Select, TextInput, Loader, rem,
+  FileButton, Accordion, Divider, Skeleton, Button, Modal, Flex, ActionIcon, Menu, Center, Select, TextInput, Loader, rem, Table, Checkbox
 } from '@mantine/core';
 import {
-  IconMap, IconPhone, IconCalendarEvent, IconDots, IconMenu2, IconAdjustments, IconInfoCircleFilled, IconCpu, IconX, IconCheck
+  IconMap, IconPhone, IconCoin, IconCalendarEvent, IconDots, IconMenu2, IconTableImport, IconInfoCircleFilled, IconCpu, IconX, IconCheck
 } from '@tabler/icons-react';
+import { OutTable, ExcelRenderer} from 'react-excel-renderer';
 
 import AddDevices from './AddDevices';
 
-import { getLandfills, devicesByLandfillsID } from './graphql/queries';
-import { onCreateDevices, onUpdateDevices, onDeleteDevices } from './graphql/subscriptions';
-import { updateDevices } from './graphql/mutations';
+import { getLandfills, devicesByLandfillsID, gasWellsByLandfillsID } from './graphql/queries';
+import { onCreateDevices, onUpdateDevices, onDeleteDevices, onCreateGasWells, onUpdateGasWells, onDeleteGasWells } from './graphql/subscriptions';
+import { updateDevices, createDevices, createGasWells } from './graphql/mutations';
+import { useListState } from '@mantine/hooks';
 
 import moment from 'moment';
 import { CompactTable } from '@table-library/react-table-library/compact';
@@ -25,12 +27,21 @@ const key = 'Editable';
 
 const LandfillProfiles = () => {
   const { id } = useParams();
-  const [usedData, setUsedData] = useState([]);
+  const [file, setFile] = useState(null);
+  const [fileGasWell, setFileGasWell] = useState(null);
 
+  const [usedData, setUsedData] = useState([]);
   const [landfill, setLandfill] = useState(null);
   const [allDevices, setAllDevices] = useState([]);
+  const [allGasWells, setAllGasWells] = useState([]);
+  const [data, setData] = useState([]);
+  const [gasWellData, setGasWellData] = useState([]);
+  
   const [opened, { open, close }] = useDisclosure(false);
   const [openedModal, { open: openModal, close: closeModal }] = useDisclosure(false);
+  const [openedModalImportDevice, { open: openModalImportDevice, close: closeModalImportDevice }] = useDisclosure(false);
+  const [openedModalImportGasWell, { open: openModalImportGasWell, close: closeModalImportGasWell }] = useDisclosure(false);
+
   const [openAccordion, setOpenAccordion] = useState([]);
   const [drawerContent, setDrawerContent] = useState('');
   const [selectedGasWell, setSelectedGasWell] = useState(null);
@@ -38,6 +49,20 @@ const LandfillProfiles = () => {
   const [activeContent, setActiveContent] = useState('general');
   const [rowData, setRowData] = useState([]);
   const [prevValue, setPrevValue] = useState('');
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRowsGasWell, setSelectedRowsGasWell] = useState([]);
+  const [modalTitle, setModalTitle] = useState('');
+
+//Loading States
+const [deviceImportLoading, setDeviceImportLoading] = useState(false);
+const [gasWellImportLoading, setGasWellImportLoading] = useState(false);
+
+const [fileType, setFileType] = useState('');
+const [rows, setRows] = useState([]);
+const [cols, setCols] = useState([]);
+  const allChecked = selectedRows.length === rows.length;
+  const indeterminate = selectedRows.length > 0 && !allChecked;
+  const limit = 150;  // Limit parameter
 
   const setOriginalValue = (value, id, property) => {
 
@@ -45,10 +70,156 @@ const LandfillProfiles = () => {
 
   }
 
+  const handleFile = (event) => {
+    
+  if(!file){
+    return;
+  }
+
+    let fileObj = file;
+
+    ExcelRenderer(fileObj, async (err, resp) => {
+      if (err) {
+        console.log(err);            
+      } else {
+        console.log(resp)
+        
+        console.log('fileType',fileType)
+        const existingIndexes = fileType == 'devices' ? [
+          resp.rows[0].indexOf('deviceName') > -1, 
+          resp.rows[0].indexOf('deviceType') > -1, 
+          resp.rows[0].indexOf('macAddress') > -1,
+          resp.rows[0].indexOf('serialNum') > -1,
+          resp.rows[0].indexOf('lastICCID') > -1,
+        ] : [
+          resp.rows[0].indexOf('gasWellName') > -1, 
+          resp.rows[0].indexOf('type') > -1, 
+          resp.rows[0].indexOf('subtype') > -1,
+          resp.rows[0].indexOf('lat') > -1,
+          resp.rows[0].indexOf('lng') > -1,
+        ]
+
+        if(existingIndexes.every((value) => value == true)){
+
+          const newTable = resp.rows.map(dev => { 
+            return fileType == 'devices' ? {
+              deviceName : dev[resp.rows[0].indexOf('deviceName')], 
+              deviceType : dev[resp.rows[0].indexOf('deviceType')], 
+              macAddress : dev[resp.rows[0].indexOf('macAddress')],
+              serialNum : dev[resp.rows[0].indexOf('serialNum')],
+              iccid : dev[resp.rows[0].indexOf('lastICCID')],
+          } : {
+              gasWellName : dev[resp.rows[0].indexOf('gasWellName')], 
+              type : dev[resp.rows[0].indexOf('type')], 
+              subtype : dev[resp.rows[0].indexOf('subtype')] == '2 In Well' ? '2" Well' : (dev[resp.rows[0].indexOf('subtype')] == '3 In Well' ? '3" Well' : dev[resp.rows[0].indexOf('subtype')]),
+              lat : dev[resp.rows[0].indexOf('lat')],
+              lng : dev[resp.rows[0].indexOf('lng')],
+          }
+            
+          })
+          
+          console.log("New Table",newTable)
+          let firstElement = newTable.shift();
+
+          const thRow = fileType == 'devices' ? [
+            { name: "Device Name", key: 0 },
+            { name: "Device Type", key: 1 },
+            { name: "Mac Address", key: 2 },
+            { name: "Serial Number", key: 3 },
+            { name: "ICCID", key: 4 }
+          ] :  [
+            { name: "Gas Well Name", key: 0 },
+            { name: "Type", key: 1 },
+            { name: "Subtype", key: 2 },
+            { name: "Latitutde", key: 3 },
+            { name: "Longitude", key: 4 }
+          ]
+
+
+
+          setCols(thRow);
+          setRows(newTable.sort((a, b) => fileType == 'devices' ? a.deviceName.localeCompare(b.deviceName) : a.gasWellName.localeCompare(b.gasWellName)));
+
+        } else {
+          setCols([{name: "Can't find the proper columns!", key: 0}]);
+          setRows([]);
+        }
+        
+      }
+    });
+  };
+
+
+  const handleDeviceImport = async () => {
+    console.log(selectedRows)
+    setDeviceImportLoading(true)
+    const typeTitle = fileType == 'devices' ? "Devices" : "Gas Wells";
+
+      try {
+        for (const selectedRow of selectedRows){
+
+          const inputData = fileType == 'devices' ? {
+            "macAddress": selectedRow.macAddress,
+            "deviceName": selectedRow.deviceName,
+            "iccid": selectedRow.iccid,
+            "serialNum": selectedRow.serialNum,
+            "deviceType": selectedRow.deviceType,
+            "landfillsID": id,
+            "flowMeter": "",
+            "restrictionSize": 0,
+            "pipeSize": 0,
+          } : {
+            "gasWellName": selectedRow.gasWellName,
+            "type": selectedRow.type,
+            "subtype": selectedRow.subtype,
+            "lat": selectedRow.lat,
+            "lng": selectedRow.lng,
+            "landfillsID": id,
+          }
+          
+
+          await client.graphql({
+              query: fileType == 'devices' ? createDevices : createGasWells,
+              variables: {
+                  input: inputData
+              }
+          });
+        }
+      
+
+      notifications.show({
+        id: 'success-adding-devices',
+        withCloseButton: true,
+        autoClose: 5000,
+        title: `${typeTitle} Added!`,
+        message: `New ${typeTitle} have been added.`,
+        icon: <IconCheck />,
+        color: 'green'
+      });
+        closeModalImportDevice();
+        setDeviceImportLoading(false);
+      
+    } catch (error) {
+      console.error('Error adding:', error);
+
+      notifications.show({
+        id: 'error-adding-devices',
+        withCloseButton: true,
+        autoClose: 5000,
+        title: 'Error',
+        message: `There's been an error adding your ${typeTitle}: ${error}`,
+        icon: <IconX />,
+        color: 'red'
+      });
+      closeModalImportDevice();
+      setDeviceImportLoading(false);
+    }
+    
+
+  }
+
   const handleUpdate = (value, id, property) => {
 
-    console.log(value, id, property)
-    console.log("Prev Value", prevValue)
     setData((state) => {
       const nodeIndex = state.nodes.findIndex((node) => node.id === id);
       if (nodeIndex === -1 || state.nodes[nodeIndex][property] === value) {
@@ -98,6 +269,18 @@ const LandfillProfiles = () => {
         { value: 'Header Monitor', label: 'Header Monitor' },
         { value: 'Smart Well', label: 'Smart Well' },
       ];
+
+      const subtypeOptions = {
+        'Header Monitor': [
+          { value: 'Above Surface', label: 'Above Surface' },
+          { value: 'Subsurface', label: 'Subsurface' },
+          { value: 'Riser', label: 'Riser' },
+        ],
+        'Smart Well': [
+          { value: '2" Well', label: '2" Well' },
+          { value: '3" Well', label: '3" Well' },
+        ],
+      };
     
       const COLUMNS = [
         {
@@ -181,12 +364,93 @@ const LandfillProfiles = () => {
           ),
         },
       ];
+      const columnsGasWell = [
+        {
+          label: 'Gas Well Name',
+          width: '175px',
+          renderCell: (item) => (
+            <TextInput
+              type="text"
+              className="no-border"
+              border={'none!important'}
+              style={{ width: '100%', border: 'none!important', outline: 'none', fontSize: '1rem', padding: 0, margin: 0 }}
+              value={item.gasWellName}
+              // onChange={(event) => handleUpdate(event.target.value, item.id, 'deviceName')}
+              // onBlur={(event) => handleUpdateToDatabase(event, item.id, 'deviceName')}
+              // onFocus={(event) => setOriginalValue(event.target.value, item.id, 'deviceName')}
 
+            />
+          ),
+        },
+        {
+          label: 'Type',
+          width: '175px',
+          renderCell: (item) => (
+            <Select
+              style={{ width: '100%', border: 'none', fontSize: '1rem', padding: 0, margin: 0 }}
+              className="no-border"
+              value={item.type}
+              data={deviceTypeOptions}
+              // onChange={(event) => handleUpdate(event, item.id, 'deviceType')}
+              // onFocus={(event) => setOriginalValue(event.target.value, item.id, 'deviceType')}
+
+            >
+            </Select>
+          ),
+        },
+        {
+          label: 'Subtype',
+          width: '175px',
+          renderCell: (item) => (
+            <Select
+              style={{ width: '100%', border: 'none', fontSize: '1rem', padding: 0, margin: 0 }}
+              className="no-border"
+              value={item.subtype}
+              data={subtypeOptions[item.type]}
+              // onChange={(event) => handleUpdate(event, item.id, 'deviceType')}
+              // onFocus={(event) => setOriginalValue(event.target.value, item.id, 'deviceType')}
+
+            >
+            </Select>
+          ),
+        },
+        {
+          label: 'Latitude',
+          width: '175px',
+          renderCell: (item) => (
+            <TextInput
+              type="text"
+              className="no-border"
+              style={{ width: '100%', border: 'none', fontSize: '1rem', padding: 0, margin: 0 }}
+              value={item.lat}
+              // onChange={(event) => handleUpdate(event.target.value, item.id, 'serialNum')}
+              // onBlur={(event) => handleUpdateToDatabase(event.target.value, item.id, 'serialNum')}
+              // onFocus={(event) => setOriginalValue(event.target.value, item.id, 'serialNum')}
+            />
+          ),
+        },
+        {
+          label: 'Longitude',
+          width: '175px',
+          renderCell: (item) => (
+            <TextInput
+              type="text"
+              className="no-border"
+              style={{ width: '100%', border: 'none', fontSize: '1rem', padding: 0, margin: 0 }}
+              value={item.lng}
+              // onChange={(event) => handleUpdate(event.target.value, item.id, 'serialNum')}
+              // onBlur={(event) => handleUpdateToDatabase(event.target.value, item.id, 'serialNum')}
+              // onFocus={(event) => setOriginalValue(event.target.value, item.id, 'serialNum')}
+            />
+          ),
+        }
+      ];
   const isMobile = window.innerWidth <= 768;
-  const client = generateClient();
+  const client = generateClient();  
 
-  const columnLabels = ["Device Name", "Device Type", "Serial Number", "Mac Address", "ICCID"];
-  const [data, setData] = useState([]);
+  useEffect(() => {
+    handleFile(fileType);
+  },[file]);
 
   useEffect(() => {
     const fetchLandfill = async () => {
@@ -199,12 +463,11 @@ const LandfillProfiles = () => {
 
         const deviceData = await client.graphql({
           query: devicesByLandfillsID,
-          variables: { landfillsID: id },
+          variables: { landfillsID: id, limit },
         });
 
-
-
         setAllDevices(deviceData.data.devicesByLandfillsID.items);
+
         const initialData = deviceData.data.devicesByLandfillsID.items
         .sort((a, b) => a.deviceName.localeCompare(b.deviceName))
         .map(device => {
@@ -216,10 +479,33 @@ const LandfillProfiles = () => {
             'macAddress': device.macAddress || '',
             'iccid': device.iccid || '',
           };
-      });
+        });
+
         setData({nodes: initialData});
 
-        console.log(initialData)
+        const gasWellData = await client.graphql({
+          query: gasWellsByLandfillsID,
+          variables: { landfillsID: id, limit },
+        });
+
+        setAllGasWells(gasWellData.data.gasWellsByLandfillsID.items);
+
+        const initialGasWellData = gasWellData.data.gasWellsByLandfillsID.items
+        .sort((a, b) => a.gasWellName.localeCompare(b.gasWellName))
+        .map(gasWell => {
+          return {
+            'id': gasWell.id,
+            'gasWellName': gasWell.gasWellName || '',
+            'type': gasWell.type || '',
+            'subtype': gasWell.subtype || '',
+            'lat': gasWell.lat || '',
+            'lng': gasWell.lng || '',
+          };
+        });
+
+        setGasWellData({nodes: initialGasWellData});
+
+        console.log(initialGasWellData)
       } catch (error) {
         console.error('Error fetching dec:', error);
       }
@@ -298,11 +584,85 @@ const LandfillProfiles = () => {
       }
     });
   
+    const createSubGasWell = client.graphql({
+      query: onCreateGasWells,
+      }).subscribe({
+      next: (eventData) => {
+          console.log("Created New Gas Wells",eventData)
+        const newEntry = eventData.data.onCreateGasWells;
+        console.log(newEntry)
+        if (newEntry.landfillsID === id) {
+          setAllGasWells((prevGasWells) => {
+            const updatedGasWells = [...prevGasWells, newEntry].sort((a, b) => a.gasWellName.localeCompare(b.gasWellName));
+            setGasWellData({ nodes: updatedGasWells.map(gasWell => ({
+              'id': gasWell.id,
+              'gasWellName': gasWell.gasWellName || '',
+              'type': gasWell.type || '',
+              'subtype': gasWell.subtype || '',
+              'lat': gasWell.lat || '',
+              'lng': gasWell.lng || '',
+            }))});
+            return updatedGasWells;
+          });
+        }
+      }
+    });
+
+    const updateSubGasWell = client.graphql({
+      query: onUpdateGasWells
+    }).subscribe({
+      next: (eventData) => {
+          console.log("Updated New GasWell",eventData)
   
+        const updatedEntry = eventData.data.onUpdateGasWells;
+        if (updatedEntry.landfillsID === id) {
+          setAllDevices((prevDevices) => {
+            const updatedGasWells = prevDevices.map((device) =>
+              device.id === updatedEntry.id ? updatedEntry : device
+            ).sort((a, b) => a.gasWellName.localeCompare(b.gasWellName));
+            setGasWellData({ nodes: updatedGasWells.map(gasWell => ({
+              'id': gasWell.id,
+              'gasWellName': gasWell.gasWellName || '',
+              'type': gasWell.type || '',
+              'subtype': gasWell.subtype || '',
+              'lat': gasWell.lat || '',
+              'lng': gasWell.lng || '',
+            }))});
+            return updatedGasWells;
+          });
+        }
+      }
+    });
+    
+    const deleteSubGasWell = client.graphql({
+      query: onDeleteGasWells
+    }).subscribe({
+      next: (eventData) => {
+          console.log("Deleted New GasWell",eventData)
+  
+        const deletedEntry = eventData.data.onDeleteGasWells;
+        setAllDevices((prevDevices) => {
+          const updatedGasWells = prevDevices.filter(device => device.id !== deletedEntry.id);
+          setGasWellData({ nodes: updatedGasWells.map(gasWell => ({
+            'id': gasWell.id,
+            'gasWellName': gasWell.gasWellName || '',
+            'type': gasWell.type || '',
+            'subtype': gasWell.subtype || '',
+            'lat': gasWell.lat || '',
+            'lng': gasWell.lng || '',
+          }))});
+          return updatedGasWells;
+        });
+      }
+    });
+
     return () => {
       createSub.unsubscribe();
       updateSub.unsubscribe();
       deleteSub.unsubscribe();
+      createSubGasWell.unsubscribe();
+      updateSubGasWell.unsubscribe();
+      deleteSubGasWell.unsubscribe();
     };
   }, [id]);
   const theme = useTheme([
@@ -342,6 +702,7 @@ border-left: none ;
   const menuItems = [
     { value: 'general', label: 'General', icon: <IconInfoCircleFilled style={iconStyle} stroke={1.1} /> },
     { value: 'devices', label: 'Devices', icon: <IconCpu style={iconStyle} stroke={1.1} /> },
+    { value: 'gasWells', label: 'GasWells', icon: <IconCoin style={iconStyle} stroke={1.1} /> },
   ];
 
   const renderContent = () => {
@@ -382,13 +743,35 @@ border-left: none ;
       case 'devices':
         return (
           <div style={{ padding: '0.75rem', width: '100%', overflowY: 'auto' }}>
-            <h5>Devices</h5>
-            {allDevices ? 
+            <Flex
+            justify='space-between'
+            align='center'
+            >
+              <h5>Devices</h5>
+              
+              <Button
+              onClick={() => {
+                openModalImportDevice(); 
+                setFileType('devices'); 
+                setFile(null); 
+                setSelectedRows([]); 
+                setModalTitle('Import Devices');
+              }} leftSection={<IconTableImport style={{ width: '1rem', height: '1rem' }}  />}>Import</Button>
+            </Flex>
+            
+            {allDevices.length > 0 ? 
             (
               <div style={{ overflow: 'auto', padding: '1rem 0' }}>
-                {data && 
-
-                <CompactTable columns={COLUMNS} data={data} theme={theme} layout={{ custom: true }}/>
+                {data ?
+                 
+                  ( <>
+                    <CompactTable 
+                    columns={COLUMNS} 
+                    data={data} 
+                    theme={theme} 
+                    layout={{ custom: true }}/>
+                    </>) :
+                  (<Center style={{padding: '1rem', }}><Loader color="blue" /></Center>)
                 }
                 
             </div>
@@ -401,9 +784,69 @@ border-left: none ;
 
           </div>
         );
+        case 'gasWells':
+          return (
+            <div style={{ padding: '0.75rem', width: '100%', overflowY: 'auto' }}>
+              <Flex
+              justify='space-between'
+              align='center'
+              >
+                <h5>Gas Wells</h5>
+                
+                <Button 
+                onClick={() => {
+                  openModalImportDevice(); 
+                  setFileType('gasWells'); 
+                  setFile(null); 
+                  setSelectedRows([]); 
+                  setModalTitle('Import Gas Wells');
+                }} 
+                  
+                leftSection={<IconTableImport style={{ width: '1rem', height: '1rem' }}  />}>Import</Button>
+              </Flex>
+              
+              {allGasWells.length > 0 ? 
+              (
+                <div style={{ overflow: 'auto', padding: '1rem 0' }}>
+                  {gasWellData ?
+                   
+                    ( <>
+                      <CompactTable 
+                      columns={columnsGasWell} 
+                      data={gasWellData} 
+                      theme={theme} 
+                      layout={{ custom: true }}/>
+                      </>) :
+                    (<Center style={{padding: '1rem', }}><Loader color="blue" /></Center>)
+                  }
+                  
+              </div>
+                
+              ) : (
+                <div>No devices found.</div>
+              )
+  
+              }
+  
+            </div>
+          );
       default:
         return <div style={{ padding: '0.75rem' }}>Select an option from the menu.</div>;
     }
+  };
+
+
+  const handleTableSelectImport = (event, deviceName) => {
+
+    setSelectedRows(
+      event.currentTarget.checked
+        ? [...selectedRows, deviceName]
+        : selectedRows.filter((name) => name !== deviceName)
+    )
+  }
+
+  const toggleAll = () => {
+    setSelectedRows(allChecked || indeterminate ? [] : rows.map((row) => row));
   };
 
   return (
@@ -411,6 +854,58 @@ border-left: none ;
     <Modal zIndex={1050} opened={openedModal} onClose={closeModal} title="Add Devices">
     <AddDevices landfillsID={id} landfillName={landfill?.name} closeModal={closeModal} allDevices={allDevices}/>
   </Modal>
+  <Modal zIndex={1050} size="auto" opened={openedModalImportDevice} onClose={closeModalImportDevice} title={modalTitle}>
+    <Flex 
+    justify='space-between'
+    align='center'
+    gap='1rem'
+    >
+      <FileButton color='gray' onChange={setFile} accept="text/csv">
+        {(props) => <Button {...props}>Upload CSV</Button>}
+      </FileButton>
+      <Button onClick={handleDeviceImport} loading={deviceImportLoading} color='green' disabled={selectedRows.length == 0}>Import Data</Button>
+    </Flex>
+
+    {file &&
+    <Table mt='1rem' >
+    <Table.Thead>
+      <Table.Tr>
+        <Table.Th>
+          <Checkbox
+            checked={allChecked}
+            indeterminate={indeterminate}
+            onChange={toggleAll}
+          />
+
+        </Table.Th>
+        {cols.map((col, index) => (
+          <Table.Th key={index}>{col.name}</Table.Th>
+        ))}
+      </Table.Tr>
+    </Table.Thead>
+    <Table.Tbody>
+     
+      {rows.map((row, rowIndex) => (
+        <Table.Tr key={rowIndex} bg={selectedRows.some(thisRow => fileType == 'devices' ? thisRow.deviceName == row.deviceName : thisRow.gasWellName == row.gasWellName) ? 'var(--mantine-color-blue-light)' : undefined}
+>
+          <Table.Td>
+            <Checkbox
+              aria-label="Select row"
+              checked={selectedRows.some(thisRow => fileType == 'devices' ? thisRow.deviceName == row.deviceName : thisRow.gasWellName == row.gasWellName)}
+              onChange={(event) => handleTableSelectImport(event, row)}
+            />
+          </Table.Td>
+          {Object.values(row).map((cell, cellIndex) => (
+            <Table.Td  key={cellIndex}>{cell}</Table.Td>
+          ))}
+        </Table.Tr>
+      ))}
+    </Table.Tbody>
+  </Table>
+    }
+      
+  </Modal>
+ 
       <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
         <div style={{ backgroundColor: '#fcfcfc', padding: '1rem 0.75rem'}}>
           <Flex
@@ -497,8 +992,8 @@ border-left: none ;
         <Divider />
         <div style={{ display: 'flex', flexGrow: 1 }}>
           <Flex
+          gap={0}
             direction="column"
-            spacing="xs"
             style={{
               backgroundColor: '#f0f0f0',
               height: '100%',

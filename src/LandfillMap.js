@@ -52,6 +52,7 @@ const LandfillMap = () => {
   const [selectedPriorities, setSelectedPriorities] = useState([]);
   const [devices, setDevices] = useState([]);
   const [services, setServices] = useState({});
+const limit = 150;
 
   const filteredGasWells = gasWells
   .filter(well => selectedSubtypes.includes(well.subtype))
@@ -91,7 +92,7 @@ const LandfillMap = () => {
 
         const gasWellsData = await client.graphql({
             query: gasWellsByLandfillsID,
-            variables: { landfillsID: id }
+            variables: { landfillsID: id, limit }
         });
 
         const gasWells = gasWellsData.data.gasWellsByLandfillsID.items;
@@ -211,7 +212,7 @@ const LandfillMap = () => {
     try {
         const deviceData = await client.graphql({
             query: devicesByLandfillsID,
-            variables: { landfillsID: id }
+            variables: { landfillsID: id, limit }
         });
         console.log("Devices",deviceData.data.devicesByLandfillsID.items)
         let newDeviceArray = deviceData.data.devicesByLandfillsID.items.reduce((acc, obj) => {
@@ -229,6 +230,7 @@ const LandfillMap = () => {
   };
 
   const updateServices = (service, action) => {
+
 
     setDevices(prevServices => {
       const updatedServices = { ...prevServices };
@@ -404,10 +406,19 @@ console.log('userId',userId)
 
 
 const handleAddGasWell = async (newGasWell) => {
+  console.log(newGasWell)
   try {
     const result = await client.graphql({
       query: createGasWells,
-      variables: { input: newGasWell }
+      variables: { input: {
+        gasWellName: newGasWell.gasWellName,
+        landfillsID: newGasWell.landfillsID, // Make sure to handle notes if present
+        lat: newGasWell.lat,
+        lng: newGasWell.lng,
+        subtype: newGasWell.subtype,
+        type: newGasWell.type, 
+      }       
+     }
     });
 
     notifications.show({

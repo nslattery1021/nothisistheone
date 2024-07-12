@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput, NumberInput, Button, Group, Box, Select, Loader } from '@mantine/core';
+import { TextInput, NumberInput, Button, Group, Box, Select, Loader, Flex } from '@mantine/core';
 import { IconMapPinFilled } from '@tabler/icons-react';
+import { listGasWells } from './graphql/queries';
+import { generateClient } from 'aws-amplify/api';
+import { IconCheck, IconX } from '@tabler/icons-react';
 
 const AddGasWellForm = ({ onSubmit, landfillsID, gasWell }) => {
   const [gasWellName, setGasWellName] = useState(gasWell?.gasWellName ?? '');
@@ -12,6 +15,10 @@ const AddGasWellForm = ({ onSubmit, landfillsID, gasWell }) => {
   const [id, setId] = useState(gasWell?.id ?? '');
   const [userLocation, setUserLocation] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const [isNameAvailable, setIsNameAvailable] = useState(true);
+  const [loadingName, setLoadingName] = useState(false);
+  const client = generateClient();
 
   const getUserLocation = () => {
     // if geolocation is supported by the users browser
@@ -69,6 +76,8 @@ const AddGasWellForm = ({ onSubmit, landfillsID, gasWell }) => {
       { value: '3" Well', label: '3" Well' },
     ],
   };
+
+  const isEdit = !!gasWell?.id
 
   const restrictionSizeOptions = {
     '2" Well' : [
@@ -136,6 +145,32 @@ const AddGasWellForm = ({ onSubmit, landfillsID, gasWell }) => {
       
     // }
   }, [type, subtype, restrictionSize]);
+  useEffect(() => {
+    const handleSearch = async () => {
+      if (!gasWellName) return;
+
+      setLoadingName(true);
+      try {
+        const filter = { gasWellName: { eq: gasWellName }, landfillsID: {eq: landfillsID } };
+console.log(filter)
+        const result = await client.graphql({
+          query: listGasWells,
+          variables: { filter }
+        });
+
+        const wells = result.data.listGasWells.items;
+        console.log(wells)
+        setIsNameAvailable(wells.length === 0);
+      } catch (error) {
+        console.error('Error searching gas well name:', error);
+      }
+      setLoadingName(false);
+    };
+
+    const debounce = setTimeout(handleSearch, 500);
+
+    return () => clearTimeout(debounce);
+  }, [gasWellName]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -158,6 +193,54 @@ const AddGasWellForm = ({ onSubmit, landfillsID, gasWell }) => {
           onChange={(e) => setGasWellName(e.target.value)}
           required
         />
+        {!isEdit && (
+          <>
+          
+          {loadingName && <Flex 
+            justify="flex-start"
+            align="center"
+            direction="row"
+            mt='0.25rem'
+            style={{
+              fontSize: '0.85rem'
+            }}>
+              <Loader size={15} type="dots" mr='0.5rem' /> 
+              Checking availability...
+              </Flex>
+             }
+      {!loadingName && gasWellName && (
+          isNameAvailable ? (
+            <Flex 
+            justify="flex-start"
+            align="center"
+            direction="row"
+            mt='0.25rem'
+            style={{
+              color: '#23ad5c',
+              fontSize: '0.85rem'
+            }}>
+              <IconCheck height='12' color='#23ad5c'/> 
+              Name is available
+              </Flex>
+          ) : (
+            <Flex 
+            justify="flex-start"
+            align="center"
+            direction="row"
+            mt='0.25rem'
+            style={{
+              color: '#f44336',
+              fontSize: '0.85rem'
+            }}>
+              <IconX height='12' color='#f44336'/> 
+              Name not available
+              </Flex>
+          )
+
+      )}
+      </>
+        )}
+        
         <Group grow>
         <NumberInput
           label="Latitude"
@@ -191,16 +274,16 @@ const AddGasWellForm = ({ onSubmit, landfillsID, gasWell }) => {
           data={type ? subtypeOptions[type] : []}
           required
         />
-        <Select
+        {/* <Select
           label="Restriction Size"
           value={restrictionSize}
           onChange={(value) => setRestrictionSize(value)}
           disabled={!type && !subtype && !restrictionSize}
           data={subtype ? restrictionSizeOptions[subtype] : []}
           required
-        />
+        /> */}
         <Group position="right" mt="md">
-          <Button type="submit">{gasWell ? 'Update Gas Well' : 'Add Gas Well'}</Button>
+          <Button disabled={!isNameAvailable && !isEdit} type="submit">{gasWell ? 'Update Gas Well' : 'Add Gas Well'}</Button>
         </Group>
       </form>
     </Box>

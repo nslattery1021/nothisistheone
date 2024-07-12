@@ -130,7 +130,7 @@ function Layout() {
       <Tabs.Tab value="dispatch" leftSection={<IconCalendarMonth stroke={1.1} style={iconStyle} />}></Tabs.Tab>
       <Tabs.Tab value="reports" leftSection={<IconFileDescription stroke={1.1} style={iconStyle} />}></Tabs.Tab>
       <Tabs.Tab value="inventory" leftSection={<IconPackages stroke={1.1} style={iconStyle} />}></Tabs.Tab>
-      <Tabs.Tab value="settings" leftSection={<IconSettings stroke={1.1} style={iconStyle} />}></Tabs.Tab>
+      <Tabs.Tab value="settings" ml="auto" leftSection={<IconSettings stroke={1.1} style={iconStyle} />}></Tabs.Tab>
       {/* <Tabs.Tab value="example" leftSection={<IconInfoSquareRounded stroke={1.1} style={iconStyle} />}></Tabs.Tab> */}
 
       </Tabs.List>
