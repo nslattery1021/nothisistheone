@@ -3,8 +3,10 @@ import React from 'react';
 import { Flex, Button, Tabs } from '@mantine/core';
 import { getCurrentUser } from 'aws-amplify/auth';
 import { signOut } from 'aws-amplify/auth';
-import Landfills from "./Landfills";
 import { IconLogout } from '@tabler/icons-react';
+
+import Landfills from "./Landfills";
+import Users from "./Users";
 
 async function handleSignOut() {
   try {
@@ -36,7 +38,6 @@ const Nav = () => {
       direction="row"
       wrap="nowrap"
     >
-<Button leftSection={<IconLogout size={14} />} variant="light" color="red" onClick={handleSignOut}>Sign Out</Button>
     </Flex>
 
     <Tabs defaultValue="landfills">
@@ -44,9 +45,24 @@ const Nav = () => {
         <Tabs.Tab value="landfills">
           Landfills
         </Tabs.Tab> 
+        <Tabs.Tab value="serviceTypes">
+          Service Types
+        </Tabs.Tab> 
+        <Tabs.Tab value="tags">
+          Tags
+        </Tabs.Tab> 
+        <Tabs.Tab value="trucks">
+          Trucks
+        </Tabs.Tab> 
+        <Tabs.Tab value="users">
+        Users
+        </Tabs.Tab> 
       </Tabs.List>
       <Tabs.Panel value="landfills">        
         <Landfills />
+      </Tabs.Panel>
+      <Tabs.Panel value="users">        
+        <Users />
       </Tabs.Panel>
     </Tabs>
     </div>

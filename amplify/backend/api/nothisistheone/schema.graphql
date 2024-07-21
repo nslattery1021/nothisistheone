@@ -1,3 +1,26 @@
+type JobTech @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  userId: ID
+  appointmentID: ID! @index(name: "byAppointment")
+}
+
+type Appointment @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  startTime: AWSDateTime
+  endTime: AWSDateTime
+  status: String
+  jobID: ID! @index(name: "byJob")
+  JobTeches: [JobTech] @hasMany(indexName: "byAppointment", fields: ["id"])
+}
+
+type Job @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  jobName: String
+  description: String
+  status: String
+  Appointments: [Appointment] @hasMany(indexName: "byJob", fields: ["id"])
+}
+
 type ServiceTypes @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String

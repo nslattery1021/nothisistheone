@@ -1,6 +1,153 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateJobTech = /* GraphQL */ `
+  subscription OnCreateJobTech($filter: ModelSubscriptionJobTechFilterInput) {
+    onCreateJobTech(filter: $filter) {
+      id
+      userId
+      appointmentID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateJobTech = /* GraphQL */ `
+  subscription OnUpdateJobTech($filter: ModelSubscriptionJobTechFilterInput) {
+    onUpdateJobTech(filter: $filter) {
+      id
+      userId
+      appointmentID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteJobTech = /* GraphQL */ `
+  subscription OnDeleteJobTech($filter: ModelSubscriptionJobTechFilterInput) {
+    onDeleteJobTech(filter: $filter) {
+      id
+      userId
+      appointmentID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateAppointment = /* GraphQL */ `
+  subscription OnCreateAppointment(
+    $filter: ModelSubscriptionAppointmentFilterInput
+  ) {
+    onCreateAppointment(filter: $filter) {
+      id
+      startTime
+      endTime
+      status
+      jobID
+      JobTeches {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateAppointment = /* GraphQL */ `
+  subscription OnUpdateAppointment(
+    $filter: ModelSubscriptionAppointmentFilterInput
+  ) {
+    onUpdateAppointment(filter: $filter) {
+      id
+      startTime
+      endTime
+      status
+      jobID
+      JobTeches {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteAppointment = /* GraphQL */ `
+  subscription OnDeleteAppointment(
+    $filter: ModelSubscriptionAppointmentFilterInput
+  ) {
+    onDeleteAppointment(filter: $filter) {
+      id
+      startTime
+      endTime
+      status
+      jobID
+      JobTeches {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateJob = /* GraphQL */ `
+  subscription OnCreateJob($filter: ModelSubscriptionJobFilterInput) {
+    onCreateJob(filter: $filter) {
+      id
+      jobName
+      description
+      status
+      Appointments {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateJob = /* GraphQL */ `
+  subscription OnUpdateJob($filter: ModelSubscriptionJobFilterInput) {
+    onUpdateJob(filter: $filter) {
+      id
+      jobName
+      description
+      status
+      Appointments {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteJob = /* GraphQL */ `
+  subscription OnDeleteJob($filter: ModelSubscriptionJobFilterInput) {
+    onDeleteJob(filter: $filter) {
+      id
+      jobName
+      description
+      status
+      Appointments {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const onCreateServiceTypes = /* GraphQL */ `
   subscription OnCreateServiceTypes(
     $filter: ModelSubscriptionServiceTypesFilterInput

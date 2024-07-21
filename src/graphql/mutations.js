@@ -1,6 +1,174 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createJobTech = /* GraphQL */ `
+  mutation CreateJobTech(
+    $input: CreateJobTechInput!
+    $condition: ModelJobTechConditionInput
+  ) {
+    createJobTech(input: $input, condition: $condition) {
+      id
+      userId
+      appointmentID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateJobTech = /* GraphQL */ `
+  mutation UpdateJobTech(
+    $input: UpdateJobTechInput!
+    $condition: ModelJobTechConditionInput
+  ) {
+    updateJobTech(input: $input, condition: $condition) {
+      id
+      userId
+      appointmentID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteJobTech = /* GraphQL */ `
+  mutation DeleteJobTech(
+    $input: DeleteJobTechInput!
+    $condition: ModelJobTechConditionInput
+  ) {
+    deleteJobTech(input: $input, condition: $condition) {
+      id
+      userId
+      appointmentID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const createAppointment = /* GraphQL */ `
+  mutation CreateAppointment(
+    $input: CreateAppointmentInput!
+    $condition: ModelAppointmentConditionInput
+  ) {
+    createAppointment(input: $input, condition: $condition) {
+      id
+      startTime
+      endTime
+      status
+      jobID
+      JobTeches {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateAppointment = /* GraphQL */ `
+  mutation UpdateAppointment(
+    $input: UpdateAppointmentInput!
+    $condition: ModelAppointmentConditionInput
+  ) {
+    updateAppointment(input: $input, condition: $condition) {
+      id
+      startTime
+      endTime
+      status
+      jobID
+      JobTeches {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteAppointment = /* GraphQL */ `
+  mutation DeleteAppointment(
+    $input: DeleteAppointmentInput!
+    $condition: ModelAppointmentConditionInput
+  ) {
+    deleteAppointment(input: $input, condition: $condition) {
+      id
+      startTime
+      endTime
+      status
+      jobID
+      JobTeches {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const createJob = /* GraphQL */ `
+  mutation CreateJob(
+    $input: CreateJobInput!
+    $condition: ModelJobConditionInput
+  ) {
+    createJob(input: $input, condition: $condition) {
+      id
+      jobName
+      description
+      status
+      Appointments {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateJob = /* GraphQL */ `
+  mutation UpdateJob(
+    $input: UpdateJobInput!
+    $condition: ModelJobConditionInput
+  ) {
+    updateJob(input: $input, condition: $condition) {
+      id
+      jobName
+      description
+      status
+      Appointments {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteJob = /* GraphQL */ `
+  mutation DeleteJob(
+    $input: DeleteJobInput!
+    $condition: ModelJobConditionInput
+  ) {
+    deleteJob(input: $input, condition: $condition) {
+      id
+      jobName
+      description
+      status
+      Appointments {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const createServiceTypes = /* GraphQL */ `
   mutation CreateServiceTypes(
     $input: CreateServiceTypesInput!

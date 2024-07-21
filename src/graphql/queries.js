@@ -1,6 +1,174 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getJobTech = /* GraphQL */ `
+  query GetJobTech($id: ID!) {
+    getJobTech(id: $id) {
+      id
+      userId
+      appointmentID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listJobTeches = /* GraphQL */ `
+  query ListJobTeches(
+    $filter: ModelJobTechFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listJobTeches(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        userId
+        appointmentID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const jobTechesByAppointmentID = /* GraphQL */ `
+  query JobTechesByAppointmentID(
+    $appointmentID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelJobTechFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    jobTechesByAppointmentID(
+      appointmentID: $appointmentID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        userId
+        appointmentID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getAppointment = /* GraphQL */ `
+  query GetAppointment($id: ID!) {
+    getAppointment(id: $id) {
+      id
+      startTime
+      endTime
+      status
+      jobID
+      JobTeches {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listAppointments = /* GraphQL */ `
+  query ListAppointments(
+    $filter: ModelAppointmentFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listAppointments(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        startTime
+        endTime
+        status
+        jobID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const appointmentsByJobID = /* GraphQL */ `
+  query AppointmentsByJobID(
+    $jobID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelAppointmentFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    appointmentsByJobID(
+      jobID: $jobID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        startTime
+        endTime
+        status
+        jobID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getJob = /* GraphQL */ `
+  query GetJob($id: ID!) {
+    getJob(id: $id) {
+      id
+      jobName
+      description
+      status
+      Appointments {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listJobs = /* GraphQL */ `
+  query ListJobs(
+    $filter: ModelJobFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listJobs(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        jobName
+        description
+        status
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getServiceTypes = /* GraphQL */ `
   query GetServiceTypes($id: ID!) {
     getServiceTypes(id: $id) {
@@ -226,20 +394,6 @@ export const devicesByLandfillsID = /* GraphQL */ `
         userId
         createdAt
         updatedAt
-        Services {
-          items {
-            completedNotes
-            createdAt
-            devicesID
-            id
-            isComplete
-            priority
-            servicetypesID
-            title
-            updatedAt
-            userId
-          }
-        }
         __typename
       }
       nextToken
@@ -338,70 +492,6 @@ export const gasWellsByLandfillsID = /* GraphQL */ `
     }
   }
 `;
-
-// export const gasWellsByLandfillsID = /* GraphQL */ `
-//   query GasWellsByLandfillsID(
-//     $landfillsID: ID!
-//     $sortDirection: ModelSortDirection
-//     $filter: ModelGasWellsFilterInput
-//     $limit: Int
-//     $nextToken: String
-//   ) {
-//     gasWellsByLandfillsID(
-//       landfillsID: $landfillsID
-//       sortDirection: $sortDirection
-//       filter: $filter
-//       limit: $limit
-//       nextToken: $nextToken
-//     ) {
-//       items {
-//         id
-//         gasWellName
-//         lat
-//         lng
-//         type
-//         subtype
-//         landfillsID
-//         Devices {
-//           deviceName
-//           serialNum
-//           macAddress
-//           deviceType
-//           flowMeter
-//           id
-//           iccid
-//           landfillsID
-//           updatedAt
-//           restrictionSize
-//           pipeSize
-//           userId
-//           createdAt
-//           Services {
-//             items {
-//               title
-//               completedNotes
-//               createdAt
-//               devicesID
-//               id
-//               userId
-//               isComplete
-//               priority
-//               updatedAt
-//               servicetypesID
-//             }
-//           }
-//         }
-//         createdAt
-//         updatedAt
-//         gasWellsDevicesId
-//         __typename
-//       }
-//       nextToken
-//       __typename
-//     }
-//   }
-// `;
-
 export const getLandfills = /* GraphQL */ `
   query GetLandfills($id: ID!) {
     getLandfills(id: $id) {

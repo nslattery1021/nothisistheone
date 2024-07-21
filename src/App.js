@@ -3,13 +3,23 @@ import React from 'react';
 // import { withAuthenticator } from '@aws-amplify/ui-react';
 import { getCurrentUser } from 'aws-amplify/auth';
 import { Authenticator } from '@aws-amplify/ui-react';
+import { signOut } from 'aws-amplify/auth';
 
 import '@aws-amplify/ui-react/styles.css';
 import '@mantine/dates/styles.css';
-import { Image, Tabs, rem } from '@mantine/core';
+import { Button, Image, Tabs, Menu, rem, Text, ActionIcon } from '@mantine/core';
 import { Routes, Route, Outlet, Link } from "react-router-dom";
 import { useNavigate, useParams } from 'react-router-dom';
-import { IconBuildingFactory, IconCalendarMonth, IconFileDescription, IconPackages, IconInfoSquareRounded, IconMessageCircle, IconSettings } from '@tabler/icons-react';
+
+import { 
+  IconBuildingFactory, 
+  IconInfoCircle, 
+  IconCalendarMonth, 
+  IconFileDescription, 
+  IconPackages, 
+  IconLogout, 
+  IconSettings } from '@tabler/icons-react';
+
 import {I18n} from 'aws-amplify/utils'
 import Home from './Home'; // Ensure correct import path
 import Inventory from './Inventory'; // Ensure correct import path
@@ -67,7 +77,6 @@ I18n.putVocabulariesForLanguage('en', {
 const App = () => {
 
   // currentAuthenticatedUser();
-  
 
   return (
     <Authenticator hideSignUp formFields={formFields} components={components} signUpAttributes={[
@@ -107,6 +116,13 @@ const App = () => {
   );
 };
 function Layout() {
+  async function handleSignOut() {
+    try {
+      await signOut({ global: true });
+    } catch (error) {
+      console.log('error signing out: ', error);
+    }
+  }
   const iconStyle = { width: rem(20), height: rem(20) };
   const navigate = useNavigate();
   const { tabValue } = useParams();
@@ -130,7 +146,37 @@ function Layout() {
       <Tabs.Tab value="dispatch" leftSection={<IconCalendarMonth stroke={1.1} style={iconStyle} />}></Tabs.Tab>
       <Tabs.Tab value="reports" leftSection={<IconFileDescription stroke={1.1} style={iconStyle} />}></Tabs.Tab>
       <Tabs.Tab value="inventory" leftSection={<IconPackages stroke={1.1} style={iconStyle} />}></Tabs.Tab>
-      <Tabs.Tab value="settings" ml="auto" leftSection={<IconSettings stroke={1.1} style={iconStyle} />}></Tabs.Tab>
+      <Menu shadow="md" width={200}>
+      <Menu.Target>
+        <ActionIcon variant="transparent" color='black' ml="auto" h={62} w={50}>
+          <IconSettings stroke={1.1} style={iconStyle} />
+        </ActionIcon>
+        {/* <Tabs.Tab value="settings" ml="auto" leftSection={<IconSettings stroke={1.1} style={iconStyle} />}></Tabs.Tab> */}
+      </Menu.Target>
+
+      <Menu.Dropdown>
+        <Menu.Label>Application</Menu.Label>
+        <Menu.Item onClick={(value) => navigate(`/settings`)} leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}>
+          Settings
+        </Menu.Item>
+        <Menu.Item leftSection={<IconInfoCircle style={{ width: rem(14), height: rem(14) }} />}>
+          Guides
+        </Menu.Item>
+        
+
+        <Menu.Divider />
+
+        <Menu.Item
+          color="red"
+          onClick={handleSignOut}
+          leftSection={<IconLogout style={{ width: rem(14), height: rem(14) }} />}
+        >
+          Logout
+        </Menu.Item>
+      </Menu.Dropdown>
+    </Menu>
+
+      
       {/* <Tabs.Tab value="example" leftSection={<IconInfoSquareRounded stroke={1.1} style={iconStyle} />}></Tabs.Tab> */}
 
       </Tabs.List>

@@ -26,6 +26,9 @@
           "unauthRoleArn": "arn:aws:iam::651155172515:role/amplify-staging-inventory-151147-unauthRole",
           "unauthRoleName": "amplify-staging-inventory-151147-unauthRole"
         }
+      },
+      "api": {
+        "nothisistheone": {}
       }
     }
   }

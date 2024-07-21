@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TextInput, Collapse, Divider, Button, Group, Box, Select, Textarea, Chip } from '@mantine/core';
 import { IconMapPinFilled } from '@tabler/icons-react';
 
-const ServiceRequestWindow = ({ onSubmit, service, devicesID, serviceTypes, deleteServiceRequest }) => {
+const ServiceRequestWindow = ({ onSubmit, service, devicesID, serviceTypes, deleteServiceRequest, userId, userFullName }) => {
   const [title, setTitle] = useState(service?.title ?? '');
   const [completedNotes, setCompletedNotes] = useState(service?.completedNotes ?? '');
   const [priority, setPriority] = useState(service?.priority ?? 'Low');
@@ -12,7 +12,7 @@ const ServiceRequestWindow = ({ onSubmit, service, devicesID, serviceTypes, dele
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newService = { id, title, priority, devicesID, servicetypesID, isComplete, completedNotes };
+    const newService = { id, title, priority, devicesID, servicetypesID, isComplete, completedNotes, userId };
     onSubmit(newService);
 
     setTitle('');
