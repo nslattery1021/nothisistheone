@@ -5,8 +5,17 @@ import {
   onUpdateJobTech,
   onDeleteJobTech,
 } from "./graphql/subscriptions";
+import { notifications } from "@mantine/notifications";
+import {
+    createAppointment,
+    createJob,
+    createJobTech,
+    updateAppointment,
+  } from "./graphql/mutations";
 import { generateClient } from "aws-amplify/api";
 import moment from "moment";
+import AddJob from "./AddJob";
+
 import {
   ActionIcon,
   Button,
@@ -20,8 +29,24 @@ import {
   Textarea,
   Container,
 } from "@mantine/core";
-const JobTechsList = ({ usersSchedule, users, filteredAppointments }) => {
+import {
+    IconChevronLeft,
+    IconChevronRight,
+    IconPlus,
+    IconCheck,
+    IconCalendarEvent,
+  } from "@tabler/icons-react";
+  import { useDisclosure } from "@mantine/hooks";
+
+const JobTechsList = ({ landfills, usersSchedule, users, filteredAppointments, selectedDate }) => {
   const [jobTechs, setJobTechs] = useState([]);
+  const [selectedTech, setSelectedTech] = useState(null);
+  const [startingDate, setStartingDate] = useState(moment());
+  const [openedModal, { open: openModal, close: closeModal }] =
+    useDisclosure(false);
+    
+  const [activeContentTitle, setActiveContentTitle] = useState("");
+  const [activeContent, setActiveContent] = useState("");
   const viewport = useRef(null);
   const client = generateClient();
   const timeSlotWidth = 120;
@@ -185,13 +210,146 @@ const JobTechsList = ({ usersSchedule, users, filteredAppointments }) => {
       deleteSub.unsubscribe();
     };
   }, [filteredAppointments]);
+  const handleAddNewJob = async (newJob) => {
+    console.log(newJob);
+    const addNewJob = {
+      description: newJob.summary,
+      status: "scheduled",
+      landfillsID: newJob.landfills,
+    };
+    console.log(addNewJob);
 
+    try {
+      const result = await client.graphql({
+        query: createJob,
+        variables: { input: addNewJob },
+      });
+
+      const newJobAdded = result.data.createJob;
+      createAppointmentAfterJob(newJobAdded.id, newJob);
+    } catch (error) {
+      console.error("Error adding gas well:", error);
+    }
+  };
+
+  const getMaxValue = (arr, prop) => {
+    return arr.reduce((max, obj) => {
+      return obj[prop] > max ? obj[prop] : max;
+    }, arr[0][prop]);
+  };
+  async function createJobTechAfterApp(appId, jobDetails) {
+    var successfulAttempt = true;
+    for (let t = 0; t < jobDetails.technicians.length; t++) {
+      const addNewJobTech = {
+        technicianId: jobDetails.technicians[t],
+        appointmentID: appId,
+      };
+
+      try {
+        const result = await client.graphql({
+          query: createJobTech,
+          variables: { input: addNewJobTech },
+        });
+
+        const newJobAdded = result.data.createJobTech;
+      } catch (error) {
+        successfulAttempt = false;
+        console.error("Error adding gas well:", error);
+      }
+    }
+
+    if (successfulAttempt) {
+      notifications.show({
+        id: "success-adding-new-job",
+        withCloseButton: true,
+        autoClose: 5000,
+        title: "New Job Added!",
+        message: `New job has been added.`,
+        icon: <IconCheck />,
+        color: "green",
+      });
+      closeModal();
+    } else {
+      console.log("ERROR ADDING JOB");
+    }
+  }
+
+  async function createAppointmentAfterJob(jobId, jobDetails) {
+    const addNewAppointment = {
+      startTime: moment(
+        `${moment(jobDetails.startDate).format("YYYY-MM-DD")}T${jobDetails.startTime}`
+      )
+        .utc()
+        .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"),
+      endTime: moment(
+        `${moment(jobDetails.endDate).format("YYYY-MM-DD")}T${jobDetails.endTime}`
+      )
+        .utc()
+        .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"),
+      jobID: jobId,
+      status: "scheduled",
+    };
+    console.log(addNewAppointment);
+
+    try {
+      const result = await client.graphql({
+        query: createAppointment,
+        variables: { input: addNewAppointment },
+      });
+
+      const newJobAdded = result.data.createAppointment;
+
+      createJobTechAfterApp(newJobAdded.id, jobDetails);
+    } catch (error) {
+      console.error("Error adding gas well:", error);
+    }
+  }
+
+  const newJob = (timeslot) => {
+    const startTimeForJob = moment(
+      `${moment(selectedDate).format("YYYY-MM-DD")}T${timeslot.timeSlot}:00`
+    ).format();
+    setStartingDate(startTimeForJob);
+    setActiveContent("addNewJob");
+    setActiveContentTitle("New Job");
+    openModal();
+  };
   function findAppointment(id) {
     return filteredAppointments.find((app) => app.id == id);
   }
+  const renderModals = () => {
+    switch (activeContent) {
+      case "addNewJob":
+        return (
+          //   <AddNewJob onSubmit={handleNewJob} startingDate={startingDate}/>
+          <AddJob
+            onSubmit={handleAddNewJob}
+            users={users}
+            landfills={landfills}
+            chosenDate={startingDate}
+            technician={selectedTech}
+          />
+        );
 
+      default:
+        return (
+          <div style={{ padding: "0.75rem" }}>
+            Select an option from the menu.
+          </div>
+        );
+    }
+  }; 
   return (
     <div>
+        <Modal
+        size="lg"
+        title={activeContentTitle}
+        zIndex={10}
+        opened={openedModal}
+        onClose={closeModal}
+      >
+        {renderModals()}
+      </Modal>
       <div
         style={{
           display: "flex",
@@ -294,11 +452,11 @@ const JobTechsList = ({ usersSchedule, users, filteredAppointments }) => {
                                 width: timeSlotWidth * jobWidth + "px",
                               }}
                             >
-                              Landfill
-                              {/* {landfills.find(
+                              {/* Landfill */}
+                              {landfills.find(
                                 (landfill) =>
-                                  landfill.id == appointment.landfillsID
-                              ).name ?? "Error"} */}
+                                  landfill.id == foundApp.Job.landfillsID
+                              )?.name ?? "Error"}
                             </div>
                           );
                         })}
@@ -306,8 +464,8 @@ const JobTechsList = ({ usersSchedule, users, filteredAppointments }) => {
                       {eachTimeSlot.map((timeSlot) => (
                         <div
                           onClick={() => {
-                            // setSelectedTech(tech.Username);
-                            // newJob({ timeSlot });
+                            setSelectedTech(tech.Username);
+                            newJob({ timeSlot });
                           }}
                           key={timeSlot}
                           className="eachTimeSlot"

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import AppointmentsList from './AppointmentsList';
-import JobTechsList from './JobTechsList';
+import React, { useState, useEffect } from "react";
+import AppointmentsList from "./AppointmentsList";
+import JobTechsList from "./JobTechsList";
 
 import { generateClient } from "aws-amplify/api";
 import { listLandfills } from "./graphql/queries";
@@ -13,7 +13,7 @@ const DispatchTest = () => {
   const [users, setUsers] = useState([]);
   const [landfills, setLandfills] = useState([]);
   const [usersSchedule, setUsersSchedule] = useState([]);
-
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const clientUser = new CognitoIdentityProviderClient({
     region: process.env.REACT_APP_REGION,
@@ -91,8 +91,18 @@ const DispatchTest = () => {
   }, []);
   return (
     <div>
-      <AppointmentsList setFilteredAppointments={setFilteredAppointments} />
-      <JobTechsList usersSchedule={usersSchedule} users={users} filteredAppointments={filteredAppointments} />
+      <AppointmentsList
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+        setFilteredAppointments={setFilteredAppointments}
+      />
+      <JobTechsList
+        selectedDate={selectedDate}
+        landfills={landfills}
+        usersSchedule={usersSchedule}
+        users={users}
+        filteredAppointments={filteredAppointments}
+      />
     </div>
   );
 };

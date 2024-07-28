@@ -127,6 +127,9 @@ export const listAppointments = /* GraphQL */ `
         userId
         createdAt
         updatedAt
+        Job {
+          landfillsID
+        }
         __typename
       }
       nextToken

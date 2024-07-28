@@ -33,9 +33,8 @@ import {
     IconCheck,
     IconCalendarEvent,
   } from "@tabler/icons-react";
-const AppointmentsList = ({ setFilteredAppointments }) => {
+const AppointmentsList = ({ setFilteredAppointments, selectedDate, setSelectedDate }) => {
   const [appointments, setAppointments] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [isToday, setIsToday] = useState(false);
   const client = generateClient();
   const isMobile = window.innerWidth <= 768;
