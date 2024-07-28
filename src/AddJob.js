@@ -32,22 +32,27 @@ import { hasLength, useForm, isNotEmpty } from "@mantine/form";
 import { generateClient } from "aws-amplify/api";
 import moment from "moment";
 
-const AddJob = ({ onSubmit, users, landfills, chosenDate }) => {
-
-    // console.log(new Date(chosenDate))
+const AddJob = ({ onSubmit, users, landfills, chosenDate, technician }) => {
+  const formatTime = (date) => {
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+  const chosenDateFormatted = new Date(chosenDate);
+const endDateHourAdd = 8;
   const form = useForm({
     mode: "controlled",
     initialValues: {
       jobType: "Service",
       summary: "",
-      technicians: [],
+      technicians: technician ? [technician] : [],
       landfills: "",
-      startDate: moment(chosenDate),
-      endDate: moment(chosenDate).add(2, "hours"),
-      startTime: moment(chosenDate).format("HH:mm"),
-      endTime: moment(chosenDate)
-        .add(2, "hours")
-        .format("HH:mm"),
+      startDate: chosenDateFormatted,
+      endDate: new Date(chosenDateFormatted.getTime() + endDateHourAdd * 60 * 60 * 1000),
+      startTime: formatTime(chosenDateFormatted),
+      endTime: formatTime(
+        new Date(chosenDateFormatted.getTime() + endDateHourAdd * 60 * 60 * 1000)
+      ),
     },
 
     validate: {
@@ -59,23 +64,23 @@ const AddJob = ({ onSubmit, users, landfills, chosenDate }) => {
       endDate: isNotEmpty("Enter end date"),
       startTime: isNotEmpty("Enter start time"),
       endTime: isNotEmpty("Enter end time"),
-      times: () => {
-        const values = form.getValues();
-        console.log(values);
+      // times: () => {
+      //   const values = form.getValues();
+      //   console.log(values);
 
-        const startDateTime = moment(
-          `${values.startDate} ${values.startTime}`,
-          "YYYY-MM-DD HH:mm"
-        );
-        const endDateTime = moment(
-          `${values.endDate} ${values.endTime}`,
-          "YYYY-MM-DD HH:mm"
-        );
-        console.log(endDateTime.isBefore(startDateTime));
-        return endDateTime.isBefore(startDateTime)
-          ? { endTime: "End time cannot be before start time" }
-          : null;
-      },
+      //   const startDateTime = moment(
+      //     `${values.startDate} ${values.startTime}`,
+      //     "YYYY-MM-DD HH:mm"
+      //   );
+      //   const endDateTime = moment(
+      //     `${values.endDate} ${values.endTime}`,
+      //     "YYYY-MM-DD HH:mm"
+      //   );
+      //   console.log(endDateTime.isBefore(startDateTime));
+      //   return endDateTime.isBefore(startDateTime)
+      //     ? { endTime: "End time cannot be before start time" }
+      //     : null;
+      // },
     },
   });
 
@@ -101,54 +106,60 @@ const AddJob = ({ onSubmit, users, landfills, chosenDate }) => {
     return times;
   };
 
+  useEffect(() => {
+    const startDateTime = new Date(form.values.startDate);
+    const [startHours, startMinutes] = form.values.startTime.split(":");
+    startDateTime.setHours(startHours, startMinutes);
+
+    const endDateTime = new Date(form.values.endDate);
+    const [endHours, endMinutes] = form.values.endTime.split(":");
+    endDateTime.setHours(endHours, endMinutes);
+
+    if (startDateTime >= endDateTime) {
+      const adjustedEndDateTime = new Date(
+        startDateTime.getTime() + endDateHourAdd * 60 * 60 * 1000
+      );
+      form.setFieldValue("endDate", adjustedEndDateTime);
+      form.setFieldValue("endTime", formatTime(adjustedEndDateTime));
+    }
+  }, [
+    form.values.startDate,
+    form.values.endDate,
+    form.values.startTime,
+    form.values.endTime,
+  ]);
+
   const timeArray = generateTimes();
   const isMobile = window.innerWidth <= 768;
 
-    const changeJobType = (newJobType) => {
+  // const changeJobType = (newJobType) => {
+  //   const currentStartTime = moment(
+  //     `${moment(form.getValues().startDate).format("YYYY-MM-DD")} ${form.getValues().startTime}`
+  //   );
+  //   const newEndTime = currentStartTime.add(
+  //     newJobType == "Installation" ? 8 : 2,
+  //     "hours"
+  //   );
 
-      const currentStartTime = moment(
-        `${moment(form.getValues().startDate).format("YYYY-MM-DD")} ${form.getValues().startTime}`
-      );
-      const newEndTime = currentStartTime
-        .add(newJobType == "Installation" ? 8 : 2, "hours")
-
-      form.setValues({
-        endDate: newEndTime,
-        endTime: newEndTime.format("HH:mm"),
-        jobType: newJobType,
-      });
-    };
-
-    const changingStartDate = (newDate) => {
-  console.log(moment(newDate))
-    }
-
-  const changingStartTime = (newTime) => {
-    const newEndTime = moment(
-      `${moment(form.getValues().startDate).format("YYYY-MM-DD")} ${newTime}`
-    ).add(form.getValues().jobType == "Installation" ? 8 : 2, "hours");
-    form.setValues({
-      endDate: newEndTime,
-      endTime: newEndTime.format("HH:mm"),
-      startTime: newTime,
-    });
+  //   form.setValues({
+  //     endDate: newEndTime,
+  //     endTime: newEndTime.format("HH:mm"),
+  //     jobType: newJobType,
+  //   });
+  // };
+  const combineDateAndTime = (date, time) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const combined = new Date(date);
+    combined.setHours(hours, minutes, 0, 0);
+    return combined;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // const newJob = {
-    //   description: summary,
-    //   techs,
-    //   jobType,
-    //   landfillsID,
-    // };
-    // onSubmit(newJob);
-    // // Clear the form fields
-    // setGasWellName('');
-    // setLat('');
-    // setLng('');
-    // setType('');
-    // setSubtype('');
+  const changingStartTime = (newTime) => {
+    form.setFieldValue('startTime', newTime);
+    const startDateTime = combineDateAndTime(form.values.startDate, newTime);
+    const adjustedEndDateTime = new Date(startDateTime.getTime() + endDateHourAdd * 60 * 60 * 1000);
+    form.setFieldValue('endDate', adjustedEndDateTime);
+    form.setFieldValue('endTime', formatTime(adjustedEndDateTime));
   };
 
   return (
@@ -177,7 +188,7 @@ const AddJob = ({ onSubmit, users, landfills, chosenDate }) => {
               style={{ flexGrow: 1 }}
               placeholder="Choose job type"
               data={["Service", "Installation"]}
-              onChange={changeJobType}
+              // onChange={changeJobType}
               clearable
               searchable
             />
@@ -190,6 +201,7 @@ const AddJob = ({ onSubmit, users, landfills, chosenDate }) => {
               style={{ flexGrow: 1 }}
               placeholder="Choose technicians"
               clearable
+              hidePickedOptions
               data={
                 users &&
                 users.map((user) => {
@@ -254,7 +266,7 @@ const AddJob = ({ onSubmit, users, landfills, chosenDate }) => {
                 {...form.getInputProps("startTime")}
                 key={form.key("startTime")}
                 data={timeArray}
-                onChange={changingStartTime}
+                // onChange={changingStartTime}
               />
               -
               <DateInput

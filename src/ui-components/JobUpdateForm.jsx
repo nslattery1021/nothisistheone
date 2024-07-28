@@ -28,12 +28,14 @@ export default function JobUpdateForm(props) {
     jobName: "",
     description: "",
     status: "",
+    userId: "",
   };
   const [jobName, setJobName] = React.useState(initialValues.jobName);
   const [description, setDescription] = React.useState(
     initialValues.description
   );
   const [status, setStatus] = React.useState(initialValues.status);
+  const [userId, setUserId] = React.useState(initialValues.userId);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = jobRecord
@@ -42,6 +44,7 @@ export default function JobUpdateForm(props) {
     setJobName(cleanValues.jobName);
     setDescription(cleanValues.description);
     setStatus(cleanValues.status);
+    setUserId(cleanValues.userId);
     setErrors({});
   };
   const [jobRecord, setJobRecord] = React.useState(jobModelProp);
@@ -64,6 +67,7 @@ export default function JobUpdateForm(props) {
     jobName: [],
     description: [],
     status: [],
+    userId: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -94,6 +98,7 @@ export default function JobUpdateForm(props) {
           jobName: jobName ?? null,
           description: description ?? null,
           status: status ?? null,
+          userId: userId ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -157,6 +162,7 @@ export default function JobUpdateForm(props) {
               jobName: value,
               description,
               status,
+              userId,
             };
             const result = onChange(modelFields);
             value = result?.jobName ?? value;
@@ -183,6 +189,7 @@ export default function JobUpdateForm(props) {
               jobName,
               description: value,
               status,
+              userId,
             };
             const result = onChange(modelFields);
             value = result?.description ?? value;
@@ -209,6 +216,7 @@ export default function JobUpdateForm(props) {
               jobName,
               description,
               status: value,
+              userId,
             };
             const result = onChange(modelFields);
             value = result?.status ?? value;
@@ -222,6 +230,33 @@ export default function JobUpdateForm(props) {
         errorMessage={errors.status?.errorMessage}
         hasError={errors.status?.hasError}
         {...getOverrideProps(overrides, "status")}
+      ></TextField>
+      <TextField
+        label="User id"
+        isRequired={false}
+        isReadOnly={false}
+        value={userId}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              jobName,
+              description,
+              status,
+              userId: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.userId ?? value;
+          }
+          if (errors.userId?.hasError) {
+            runValidationTasks("userId", value);
+          }
+          setUserId(value);
+        }}
+        onBlur={() => runValidationTasks("userId", userId)}
+        errorMessage={errors.userId?.errorMessage}
+        hasError={errors.userId?.hasError}
+        {...getOverrideProps(overrides, "userId")}
       ></TextField>
       <Flex
         justifyContent="space-between"

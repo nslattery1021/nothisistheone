@@ -1,7 +1,11 @@
 type JobTech @model @auth(rules: [{allow: public}]) {
   id: ID!
-  userId: ID
+  technicianId: ID
   appointmentID: ID! @index(name: "byAppointment")
+  dispatchTime: AWSDateTime
+  arrivalTime: AWSDateTime
+  endTime: AWSDateTime
+  Appointment: Appointment @belongsTo(fields: ["appointmentID"])
 }
 
 type Appointment @model @auth(rules: [{allow: public}]) {
@@ -11,6 +15,8 @@ type Appointment @model @auth(rules: [{allow: public}]) {
   status: String
   jobID: ID! @index(name: "byJob")
   JobTeches: [JobTech] @hasMany(indexName: "byAppointment", fields: ["id"])
+  userId: ID
+  Job: Job @belongsTo(fields: ["jobID"])
 }
 
 type Job @model @auth(rules: [{allow: public}]) {
@@ -19,6 +25,8 @@ type Job @model @auth(rules: [{allow: public}]) {
   description: String
   status: String
   Appointments: [Appointment] @hasMany(indexName: "byJob", fields: ["id"])
+  userId: String
+  landfillsID: ID! @index(name: "byLandfills")
 }
 
 type ServiceTypes @model @auth(rules: [{allow: public}]) {
@@ -78,5 +86,6 @@ type Landfills @model @auth(rules: [{allow: public}]) {
   active: Boolean
   GasWells: [GasWells] @hasMany(indexName: "byLandfills", fields: ["id"])
   Devices: [Devices] @hasMany(indexName: "byLandfills", fields: ["id"])
+  Jobs: [Job] @hasMany(indexName: "byLandfills", fields: ["id"])
 }
  

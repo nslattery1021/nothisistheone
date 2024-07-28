@@ -34,6 +34,48 @@ div.no-border div input {
   margin: 0;
 }
 
+.hovered-timeslot{
+  background: #6dffff;
+  opacity: 0.4;
+}
+
+.eachJob{
+  position: absolute;
+  border-radius: 5px;
+  font-size: 12px;
+  padding-left: 5px;
+  padding-top: 7px;
+  white-space: normal;
+  cursor: pointer;
+  font-size: 0.85rem;
+  z-index: 9;
+  height: 41px;
+  line-height: 1
+
+}
+
+.scheduled{
+  background:#c4eaf8;
+  box-shadow: inset 0 0 0 2px #77c1de;
+}
+.dispatched{
+  background:#e1c0f5;
+  box-shadow: inset 0 0 0 2px #cd9ae6;
+}
+.working{
+  background:#b3ec91;
+  box-shadow: inset 0 0 0 2px #84ca79;
+}
+.completed{
+  background:#f0f0f0;
+  box-shadow: inset 0 0 0 2px #cccccc;
+}
+.nonJob{
+  color: white;
+  background:#788287;
+  box-shadow: inset 0 0 0 2px #525050;
+}
+
 .modernExcelTable {
     width: 100%;
     border-collapse: collapse;

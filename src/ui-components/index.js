@@ -4,8 +4,6 @@
  * Any changes to this file will be overwritten when running amplify pull. *
  **************************************************************************/
 
-export { default as JobCreateForm } from "./JobCreateForm";
-export { default as JobUpdateForm } from "./JobUpdateForm";
 export { default as LandfillsCreateForm } from "./LandfillsCreateForm";
 export { default as LandfillsUpdateForm } from "./LandfillsUpdateForm";
 export { default as ServiceTypesCreateForm } from "./ServiceTypesCreateForm";

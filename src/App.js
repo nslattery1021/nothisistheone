@@ -2,12 +2,12 @@
 import React from 'react';
 // import { withAuthenticator } from '@aws-amplify/ui-react';
 import { getCurrentUser } from 'aws-amplify/auth';
-import { Authenticator } from '@aws-amplify/ui-react';
+import { Authenticator, useAuthenticator } from '@aws-amplify/ui-react';
 import { signOut } from 'aws-amplify/auth';
 
 import '@aws-amplify/ui-react/styles.css';
 import '@mantine/dates/styles.css';
-import { Button, Image, Tabs, Menu, rem, Text, ActionIcon } from '@mantine/core';
+import { Button, Image, Tabs, Menu, rem, Text, ActionIcon, Select } from '@mantine/core';
 import { Routes, Route, Outlet, Link } from "react-router-dom";
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -30,6 +30,8 @@ import LandfillProfiles from './LandfillProfiles'; // Ensure correct import path
 import Settings from './Settings'; // Ensure correct import path
 import ExampleComponent from './ExampleComponent'; // Ensure correct import path
 import Dispatch from './Dispatch';
+import DispatchTest from './DispatchTest';
+
 const components = {
   Header() {
     return (
@@ -44,27 +46,67 @@ const components = {
       </div>
     );
   },
+  SignUp: {
+    FormFields() {
+      const { validationErrors } = useAuthenticator();
+
+      return (
+        <>
+          {/* Re-use default `Authenticator.SignUp.FormFields` */}
+          <Authenticator.SignUp.FormFields />
+
+          {/* Append & require Terms and Conditions field to sign up  */}
+          <Select
+            label="Department"
+            placeholder="Choose your department"
+            data={['Assembly', 'Office', 'Technician']}
+          />
+        </>
+      );
+    },
+    // Footer() {
+    //   const { toSignIn } = useAuthenticator();
+
+    //   return (
+    //     <div >
+    //       <Button
+    //         fontWeight="normal"
+    //         onClick={toSignIn}
+    //         size="small"
+    //         variation="link"
+    //       >
+    //         Back to Sign In
+    //       </Button>
+    //     </div>
+    //   );
+    // },
+  },
 }
 const formFields = {
   signUp: {
     email: {
       order: 1
     },
-    password: {
+    preferred_username: {
+      label: 'Username',
+      placeholder: 'Enter your Username (same as email)',
       order: 2
     },
-    confirm_password: {
+    password: {
       order: 3
     },
-    family_name: {
-      label: 'Last Name',
-      placeholder: 'Enter your last name',
-      order: 5
+    confirm_password: {
+      order: 4
     },
     given_name: {
       label: 'First Name',
       placeholder: 'Enter your first name',
-      order: 4
+      order: 5
+    },
+    family_name: {
+      label: 'Last Name',
+      placeholder: 'Enter your last name',
+      order: 6
     }
   }
 }
@@ -81,6 +123,7 @@ const App = () => {
   return (
     <Authenticator hideSignUp formFields={formFields} components={components} signUpAttributes={[
       'address',
+      'preferred_username',
       'birthdate',
       'email',
       'family_name',
@@ -101,7 +144,7 @@ const App = () => {
         <Route path="/settings" element={<Settings />} />
         <Route path="/example" element={<ExampleComponent />} />
         <Route path="/inventory" element={<Inventory />} />
-        <Route path="/dispatch" element={<Dispatch />} />
+        <Route path="/dispatch" element={<DispatchTest />} />
         <Route path="/landfill/:id" element={<LandfillMap />} />
         {/* <Route path="/landfill/:id" element={<NewMap />} /> */}
         <Route path="/profile/:id" element={<LandfillProfiles />} />

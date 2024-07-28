@@ -5,8 +5,22 @@ export const onCreateJobTech = /* GraphQL */ `
   subscription OnCreateJobTech($filter: ModelSubscriptionJobTechFilterInput) {
     onCreateJobTech(filter: $filter) {
       id
-      userId
+      technicianId
       appointmentID
+      dispatchTime
+      arrivalTime
+      endTime
+      Appointment {
+        id
+        startTime
+        endTime
+        status
+        jobID
+        userId
+        createdAt
+        updatedAt
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -17,8 +31,22 @@ export const onUpdateJobTech = /* GraphQL */ `
   subscription OnUpdateJobTech($filter: ModelSubscriptionJobTechFilterInput) {
     onUpdateJobTech(filter: $filter) {
       id
-      userId
+      technicianId
       appointmentID
+      dispatchTime
+      arrivalTime
+      endTime
+      Appointment {
+        id
+        startTime
+        endTime
+        status
+        jobID
+        userId
+        createdAt
+        updatedAt
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -29,8 +57,22 @@ export const onDeleteJobTech = /* GraphQL */ `
   subscription OnDeleteJobTech($filter: ModelSubscriptionJobTechFilterInput) {
     onDeleteJobTech(filter: $filter) {
       id
-      userId
+      technicianId
       appointmentID
+      dispatchTime
+      arrivalTime
+      endTime
+      Appointment {
+        id
+        startTime
+        endTime
+        status
+        jobID
+        userId
+        createdAt
+        updatedAt
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -49,6 +91,18 @@ export const onCreateAppointment = /* GraphQL */ `
       jobID
       JobTeches {
         nextToken
+        __typename
+      }
+      userId
+      Job {
+        id
+        jobName
+        description
+        status
+        userId
+        landfillsID
+        createdAt
+        updatedAt
         __typename
       }
       createdAt
@@ -71,6 +125,18 @@ export const onUpdateAppointment = /* GraphQL */ `
         nextToken
         __typename
       }
+      userId
+      Job {
+        id
+        jobName
+        description
+        status
+        userId
+        landfillsID
+        createdAt
+        updatedAt
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -91,6 +157,18 @@ export const onDeleteAppointment = /* GraphQL */ `
         nextToken
         __typename
       }
+      userId
+      Job {
+        id
+        jobName
+        description
+        status
+        userId
+        landfillsID
+        createdAt
+        updatedAt
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -108,6 +186,8 @@ export const onCreateJob = /* GraphQL */ `
         nextToken
         __typename
       }
+      userId
+      landfillsID
       createdAt
       updatedAt
       __typename
@@ -125,6 +205,8 @@ export const onUpdateJob = /* GraphQL */ `
         nextToken
         __typename
       }
+      userId
+      landfillsID
       createdAt
       updatedAt
       __typename
@@ -142,6 +224,8 @@ export const onDeleteJob = /* GraphQL */ `
         nextToken
         __typename
       }
+      userId
+      landfillsID
       createdAt
       updatedAt
       __typename
@@ -447,6 +531,10 @@ export const onCreateLandfills = /* GraphQL */ `
         nextToken
         __typename
       }
+      Jobs {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -476,6 +564,10 @@ export const onUpdateLandfills = /* GraphQL */ `
         nextToken
         __typename
       }
+      Jobs {
+        nextToken
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -502,6 +594,10 @@ export const onDeleteLandfills = /* GraphQL */ `
         __typename
       }
       Devices {
+        nextToken
+        __typename
+      }
+      Jobs {
         nextToken
         __typename
       }

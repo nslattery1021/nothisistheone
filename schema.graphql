@@ -1,12 +1,929 @@
-type Landfills @model @auth(rules: [{allow: public}]) {
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Appointment @aws_api_key @aws_iam {
+  Job: Job
+  JobTeches(filter: ModelJobTechFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelJobTechConnection
+  createdAt: AWSDateTime!
+  endTime: AWSDateTime
   id: ID!
-  name: String
+  jobID: ID!
+  startTime: AWSDateTime
+  status: String
+  updatedAt: AWSDateTime!
+  userId: ID
+}
+
+type Devices @aws_api_key @aws_iam {
+  Services(filter: ModelServiceFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelServiceConnection
+  createdAt: AWSDateTime!
+  deviceName: String
+  deviceType: String
+  flowMeter: String
+  iccid: String
+  id: ID!
+  landfillsID: ID!
+  macAddress: String
+  pipeSize: Float
+  restrictionSize: Float
+  serialNum: String
+  updatedAt: AWSDateTime!
+  userId: ID
+}
+
+type GasWells @aws_api_key @aws_iam {
+  Devices: Devices
+  createdAt: AWSDateTime!
+  gasWellName: String!
+  gasWellsDevicesId: ID
+  id: ID!
+  landfillsID: ID!
+  lat: Float!
+  lng: Float!
+  subtype: String
+  type: String
+  updatedAt: AWSDateTime!
+}
+
+type Job @aws_api_key @aws_iam {
+  Appointments(filter: ModelAppointmentFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelAppointmentConnection
+  createdAt: AWSDateTime!
+  description: String
+  id: ID!
+  jobName: String
+  landfillsID: ID!
+  status: String
+  updatedAt: AWSDateTime!
+  userId: String
+}
+
+type JobTech @aws_api_key @aws_iam {
+  Appointment: Appointment
+  appointmentID: ID!
+  arrivalTime: AWSDateTime
+  createdAt: AWSDateTime!
+  dispatchTime: AWSDateTime
+  endTime: AWSDateTime
+  id: ID!
+  technicianId: ID
+  updatedAt: AWSDateTime!
+}
+
+type Landfills @aws_api_key @aws_iam {
+  Devices(filter: ModelDevicesFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelDevicesConnection
+  GasWells(filter: ModelGasWellsFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelGasWellsConnection
+  Jobs(filter: ModelJobFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelJobConnection
+  active: Boolean
   address: String
   city: String
-  state: String
-  zip: String
   country: String
+  createdAt: AWSDateTime!
+  id: ID!
   lat: Float
   lng: Float
+  name: String
+  state: String
+  updatedAt: AWSDateTime!
+  zip: String
+}
+
+type ModelAppointmentConnection @aws_api_key @aws_iam {
+  items: [Appointment]!
+  nextToken: String
+}
+
+type ModelDevicesConnection @aws_api_key @aws_iam {
+  items: [Devices]!
+  nextToken: String
+}
+
+type ModelGasWellsConnection @aws_api_key @aws_iam {
+  items: [GasWells]!
+  nextToken: String
+}
+
+type ModelJobConnection @aws_api_key @aws_iam {
+  items: [Job]!
+  nextToken: String
+}
+
+type ModelJobTechConnection @aws_api_key @aws_iam {
+  items: [JobTech]!
+  nextToken: String
+}
+
+type ModelLandfillsConnection @aws_api_key @aws_iam {
+  items: [Landfills]!
+  nextToken: String
+}
+
+type ModelServiceConnection @aws_api_key @aws_iam {
+  items: [Service]!
+  nextToken: String
+}
+
+type ModelServiceTypesConnection @aws_api_key @aws_iam {
+  items: [ServiceTypes]!
+  nextToken: String
+}
+
+type Mutation {
+  createAppointment(condition: ModelAppointmentConditionInput, input: CreateAppointmentInput!): Appointment @aws_api_key @aws_iam
+  createDevices(condition: ModelDevicesConditionInput, input: CreateDevicesInput!): Devices @aws_api_key @aws_iam
+  createGasWells(condition: ModelGasWellsConditionInput, input: CreateGasWellsInput!): GasWells @aws_api_key @aws_iam
+  createJob(condition: ModelJobConditionInput, input: CreateJobInput!): Job @aws_api_key @aws_iam
+  createJobTech(condition: ModelJobTechConditionInput, input: CreateJobTechInput!): JobTech @aws_api_key @aws_iam
+  createLandfills(condition: ModelLandfillsConditionInput, input: CreateLandfillsInput!): Landfills @aws_api_key @aws_iam
+  createService(condition: ModelServiceConditionInput, input: CreateServiceInput!): Service @aws_api_key @aws_iam
+  createServiceTypes(condition: ModelServiceTypesConditionInput, input: CreateServiceTypesInput!): ServiceTypes @aws_api_key @aws_iam
+  deleteAppointment(condition: ModelAppointmentConditionInput, input: DeleteAppointmentInput!): Appointment @aws_api_key @aws_iam
+  deleteDevices(condition: ModelDevicesConditionInput, input: DeleteDevicesInput!): Devices @aws_api_key @aws_iam
+  deleteGasWells(condition: ModelGasWellsConditionInput, input: DeleteGasWellsInput!): GasWells @aws_api_key @aws_iam
+  deleteJob(condition: ModelJobConditionInput, input: DeleteJobInput!): Job @aws_api_key @aws_iam
+  deleteJobTech(condition: ModelJobTechConditionInput, input: DeleteJobTechInput!): JobTech @aws_api_key @aws_iam
+  deleteLandfills(condition: ModelLandfillsConditionInput, input: DeleteLandfillsInput!): Landfills @aws_api_key @aws_iam
+  deleteService(condition: ModelServiceConditionInput, input: DeleteServiceInput!): Service @aws_api_key @aws_iam
+  deleteServiceTypes(condition: ModelServiceTypesConditionInput, input: DeleteServiceTypesInput!): ServiceTypes @aws_api_key @aws_iam
+  updateAppointment(condition: ModelAppointmentConditionInput, input: UpdateAppointmentInput!): Appointment @aws_api_key @aws_iam
+  updateDevices(condition: ModelDevicesConditionInput, input: UpdateDevicesInput!): Devices @aws_api_key @aws_iam
+  updateGasWells(condition: ModelGasWellsConditionInput, input: UpdateGasWellsInput!): GasWells @aws_api_key @aws_iam
+  updateJob(condition: ModelJobConditionInput, input: UpdateJobInput!): Job @aws_api_key @aws_iam
+  updateJobTech(condition: ModelJobTechConditionInput, input: UpdateJobTechInput!): JobTech @aws_api_key @aws_iam
+  updateLandfills(condition: ModelLandfillsConditionInput, input: UpdateLandfillsInput!): Landfills @aws_api_key @aws_iam
+  updateService(condition: ModelServiceConditionInput, input: UpdateServiceInput!): Service @aws_api_key @aws_iam
+  updateServiceTypes(condition: ModelServiceTypesConditionInput, input: UpdateServiceTypesInput!): ServiceTypes @aws_api_key @aws_iam
+}
+
+type Query {
+  appointmentsByJobID(filter: ModelAppointmentFilterInput, jobID: ID!, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelAppointmentConnection @aws_api_key @aws_iam
+  devicesByLandfillsID(filter: ModelDevicesFilterInput, landfillsID: ID!, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelDevicesConnection @aws_api_key @aws_iam
+  gasWellsByLandfillsID(filter: ModelGasWellsFilterInput, landfillsID: ID!, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelGasWellsConnection @aws_api_key @aws_iam
+  getAppointment(id: ID!): Appointment @aws_api_key @aws_iam
+  getDevices(id: ID!): Devices @aws_api_key @aws_iam
+  getGasWells(id: ID!): GasWells @aws_api_key @aws_iam
+  getJob(id: ID!): Job @aws_api_key @aws_iam
+  getJobTech(id: ID!): JobTech @aws_api_key @aws_iam
+  getLandfills(id: ID!): Landfills @aws_api_key @aws_iam
+  getService(id: ID!): Service @aws_api_key @aws_iam
+  getServiceTypes(id: ID!): ServiceTypes @aws_api_key @aws_iam
+  jobTechesByAppointmentID(appointmentID: ID!, filter: ModelJobTechFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelJobTechConnection @aws_api_key @aws_iam
+  jobsByLandfillsID(filter: ModelJobFilterInput, landfillsID: ID!, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelJobConnection @aws_api_key @aws_iam
+  listAppointments(filter: ModelAppointmentFilterInput, limit: Int, nextToken: String): ModelAppointmentConnection @aws_api_key @aws_iam
+  listDevices(filter: ModelDevicesFilterInput, limit: Int, nextToken: String): ModelDevicesConnection @aws_api_key @aws_iam
+  listGasWells(filter: ModelGasWellsFilterInput, limit: Int, nextToken: String): ModelGasWellsConnection @aws_api_key @aws_iam
+  listJobTeches(filter: ModelJobTechFilterInput, limit: Int, nextToken: String): ModelJobTechConnection @aws_api_key @aws_iam
+  listJobs(filter: ModelJobFilterInput, limit: Int, nextToken: String): ModelJobConnection @aws_api_key @aws_iam
+  listLandfills(filter: ModelLandfillsFilterInput, limit: Int, nextToken: String): ModelLandfillsConnection @aws_api_key @aws_iam
+  listServiceTypes(filter: ModelServiceTypesFilterInput, limit: Int, nextToken: String): ModelServiceTypesConnection @aws_api_key @aws_iam
+  listServices(filter: ModelServiceFilterInput, limit: Int, nextToken: String): ModelServiceConnection @aws_api_key @aws_iam
+  servicesByDevicesID(devicesID: ID!, filter: ModelServiceFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelServiceConnection @aws_api_key @aws_iam
+  servicesByServicetypesID(filter: ModelServiceFilterInput, limit: Int, nextToken: String, servicetypesID: ID!, sortDirection: ModelSortDirection): ModelServiceConnection @aws_api_key @aws_iam
+}
+
+type Service @aws_api_key @aws_iam {
+  completedNotes: String
+  createdAt: AWSDateTime!
+  devicesID: ID!
+  id: ID!
+  isComplete: Boolean
+  priority: String
+  servicetypesID: ID!
+  title: String
+  updatedAt: AWSDateTime!
+  userId: ID
+}
+
+type ServiceTypes @aws_api_key @aws_iam {
+  Services(filter: ModelServiceFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelServiceConnection
+  createdAt: AWSDateTime!
+  id: ID!
+  isActive: Boolean
+  name: String
+  updatedAt: AWSDateTime!
+}
+
+type Subscription {
+  onCreateAppointment(filter: ModelSubscriptionAppointmentFilterInput): Appointment @aws_api_key @aws_iam @aws_subscribe(mutations : ["createAppointment"])
+  onCreateDevices(filter: ModelSubscriptionDevicesFilterInput): Devices @aws_api_key @aws_iam @aws_subscribe(mutations : ["createDevices"])
+  onCreateGasWells(filter: ModelSubscriptionGasWellsFilterInput): GasWells @aws_api_key @aws_iam @aws_subscribe(mutations : ["createGasWells"])
+  onCreateJob(filter: ModelSubscriptionJobFilterInput): Job @aws_api_key @aws_iam @aws_subscribe(mutations : ["createJob"])
+  onCreateJobTech(filter: ModelSubscriptionJobTechFilterInput): JobTech @aws_api_key @aws_iam @aws_subscribe(mutations : ["createJobTech"])
+  onCreateLandfills(filter: ModelSubscriptionLandfillsFilterInput): Landfills @aws_api_key @aws_iam @aws_subscribe(mutations : ["createLandfills"])
+  onCreateService(filter: ModelSubscriptionServiceFilterInput): Service @aws_api_key @aws_iam @aws_subscribe(mutations : ["createService"])
+  onCreateServiceTypes(filter: ModelSubscriptionServiceTypesFilterInput): ServiceTypes @aws_api_key @aws_iam @aws_subscribe(mutations : ["createServiceTypes"])
+  onDeleteAppointment(filter: ModelSubscriptionAppointmentFilterInput): Appointment @aws_api_key @aws_iam @aws_subscribe(mutations : ["deleteAppointment"])
+  onDeleteDevices(filter: ModelSubscriptionDevicesFilterInput): Devices @aws_api_key @aws_iam @aws_subscribe(mutations : ["deleteDevices"])
+  onDeleteGasWells(filter: ModelSubscriptionGasWellsFilterInput): GasWells @aws_api_key @aws_iam @aws_subscribe(mutations : ["deleteGasWells"])
+  onDeleteJob(filter: ModelSubscriptionJobFilterInput): Job @aws_api_key @aws_iam @aws_subscribe(mutations : ["deleteJob"])
+  onDeleteJobTech(filter: ModelSubscriptionJobTechFilterInput): JobTech @aws_api_key @aws_iam @aws_subscribe(mutations : ["deleteJobTech"])
+  onDeleteLandfills(filter: ModelSubscriptionLandfillsFilterInput): Landfills @aws_api_key @aws_iam @aws_subscribe(mutations : ["deleteLandfills"])
+  onDeleteService(filter: ModelSubscriptionServiceFilterInput): Service @aws_api_key @aws_iam @aws_subscribe(mutations : ["deleteService"])
+  onDeleteServiceTypes(filter: ModelSubscriptionServiceTypesFilterInput): ServiceTypes @aws_api_key @aws_iam @aws_subscribe(mutations : ["deleteServiceTypes"])
+  onUpdateAppointment(filter: ModelSubscriptionAppointmentFilterInput): Appointment @aws_api_key @aws_iam @aws_subscribe(mutations : ["updateAppointment"])
+  onUpdateDevices(filter: ModelSubscriptionDevicesFilterInput): Devices @aws_api_key @aws_iam @aws_subscribe(mutations : ["updateDevices"])
+  onUpdateGasWells(filter: ModelSubscriptionGasWellsFilterInput): GasWells @aws_api_key @aws_iam @aws_subscribe(mutations : ["updateGasWells"])
+  onUpdateJob(filter: ModelSubscriptionJobFilterInput): Job @aws_api_key @aws_iam @aws_subscribe(mutations : ["updateJob"])
+  onUpdateJobTech(filter: ModelSubscriptionJobTechFilterInput): JobTech @aws_api_key @aws_iam @aws_subscribe(mutations : ["updateJobTech"])
+  onUpdateLandfills(filter: ModelSubscriptionLandfillsFilterInput): Landfills @aws_api_key @aws_iam @aws_subscribe(mutations : ["updateLandfills"])
+  onUpdateService(filter: ModelSubscriptionServiceFilterInput): Service @aws_api_key @aws_iam @aws_subscribe(mutations : ["updateService"])
+  onUpdateServiceTypes(filter: ModelSubscriptionServiceTypesFilterInput): ServiceTypes @aws_api_key @aws_iam @aws_subscribe(mutations : ["updateServiceTypes"])
+}
+
+enum ModelAttributeTypes {
+  _null
+  binary
+  binarySet
+  bool
+  list
+  map
+  number
+  numberSet
+  string
+  stringSet
+}
+
+enum ModelSortDirection {
+  ASC
+  DESC
+}
+
+input CreateAppointmentInput {
+  endTime: AWSDateTime
+  id: ID
+  jobID: ID!
+  startTime: AWSDateTime
+  status: String
+  userId: ID
+}
+
+input CreateDevicesInput {
+  deviceName: String
+  deviceType: String
+  flowMeter: String
+  iccid: String
+  id: ID
+  landfillsID: ID!
+  macAddress: String
+  pipeSize: Float
+  restrictionSize: Float
+  serialNum: String
+  userId: ID
+}
+
+input CreateGasWellsInput {
+  gasWellName: String!
+  gasWellsDevicesId: ID
+  id: ID
+  landfillsID: ID!
+  lat: Float!
+  lng: Float!
+  subtype: String
+  type: String
+}
+
+input CreateJobInput {
+  description: String
+  id: ID
+  jobName: String
+  landfillsID: ID!
+  status: String
+  userId: String
+}
+
+input CreateJobTechInput {
+  appointmentID: ID!
+  arrivalTime: AWSDateTime
+  dispatchTime: AWSDateTime
+  endTime: AWSDateTime
+  id: ID
+  technicianId: ID
+}
+
+input CreateLandfillsInput {
   active: Boolean
+  address: String
+  city: String
+  country: String
+  id: ID
+  lat: Float
+  lng: Float
+  name: String
+  state: String
+  zip: String
+}
+
+input CreateServiceInput {
+  completedNotes: String
+  devicesID: ID!
+  id: ID
+  isComplete: Boolean
+  priority: String
+  servicetypesID: ID!
+  title: String
+  userId: ID
+}
+
+input CreateServiceTypesInput {
+  id: ID
+  isActive: Boolean
+  name: String
+}
+
+input DeleteAppointmentInput {
+  id: ID!
+}
+
+input DeleteDevicesInput {
+  id: ID!
+}
+
+input DeleteGasWellsInput {
+  id: ID!
+}
+
+input DeleteJobInput {
+  id: ID!
+}
+
+input DeleteJobTechInput {
+  id: ID!
+}
+
+input DeleteLandfillsInput {
+  id: ID!
+}
+
+input DeleteServiceInput {
+  id: ID!
+}
+
+input DeleteServiceTypesInput {
+  id: ID!
+}
+
+input ModelAppointmentConditionInput {
+  and: [ModelAppointmentConditionInput]
+  createdAt: ModelStringInput
+  endTime: ModelStringInput
+  jobID: ModelIDInput
+  not: ModelAppointmentConditionInput
+  or: [ModelAppointmentConditionInput]
+  startTime: ModelStringInput
+  status: ModelStringInput
+  updatedAt: ModelStringInput
+  userId: ModelIDInput
+}
+
+input ModelAppointmentFilterInput {
+  and: [ModelAppointmentFilterInput]
+  createdAt: ModelStringInput
+  endTime: ModelStringInput
+  id: ModelIDInput
+  jobID: ModelIDInput
+  not: ModelAppointmentFilterInput
+  or: [ModelAppointmentFilterInput]
+  startTime: ModelStringInput
+  status: ModelStringInput
+  updatedAt: ModelStringInput
+  userId: ModelIDInput
+}
+
+input ModelBooleanInput {
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  eq: Boolean
+  ne: Boolean
+}
+
+input ModelDevicesConditionInput {
+  and: [ModelDevicesConditionInput]
+  createdAt: ModelStringInput
+  deviceName: ModelStringInput
+  deviceType: ModelStringInput
+  flowMeter: ModelStringInput
+  iccid: ModelStringInput
+  landfillsID: ModelIDInput
+  macAddress: ModelStringInput
+  not: ModelDevicesConditionInput
+  or: [ModelDevicesConditionInput]
+  pipeSize: ModelFloatInput
+  restrictionSize: ModelFloatInput
+  serialNum: ModelStringInput
+  updatedAt: ModelStringInput
+  userId: ModelIDInput
+}
+
+input ModelDevicesFilterInput {
+  and: [ModelDevicesFilterInput]
+  createdAt: ModelStringInput
+  deviceName: ModelStringInput
+  deviceType: ModelStringInput
+  flowMeter: ModelStringInput
+  iccid: ModelStringInput
+  id: ModelIDInput
+  landfillsID: ModelIDInput
+  macAddress: ModelStringInput
+  not: ModelDevicesFilterInput
+  or: [ModelDevicesFilterInput]
+  pipeSize: ModelFloatInput
+  restrictionSize: ModelFloatInput
+  serialNum: ModelStringInput
+  updatedAt: ModelStringInput
+  userId: ModelIDInput
+}
+
+input ModelFloatInput {
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  between: [Float]
+  eq: Float
+  ge: Float
+  gt: Float
+  le: Float
+  lt: Float
+  ne: Float
+}
+
+input ModelGasWellsConditionInput {
+  and: [ModelGasWellsConditionInput]
+  createdAt: ModelStringInput
+  gasWellName: ModelStringInput
+  gasWellsDevicesId: ModelIDInput
+  landfillsID: ModelIDInput
+  lat: ModelFloatInput
+  lng: ModelFloatInput
+  not: ModelGasWellsConditionInput
+  or: [ModelGasWellsConditionInput]
+  subtype: ModelStringInput
+  type: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input ModelGasWellsFilterInput {
+  and: [ModelGasWellsFilterInput]
+  createdAt: ModelStringInput
+  gasWellName: ModelStringInput
+  gasWellsDevicesId: ModelIDInput
+  id: ModelIDInput
+  landfillsID: ModelIDInput
+  lat: ModelFloatInput
+  lng: ModelFloatInput
+  not: ModelGasWellsFilterInput
+  or: [ModelGasWellsFilterInput]
+  subtype: ModelStringInput
+  type: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input ModelIDInput {
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  beginsWith: ID
+  between: [ID]
+  contains: ID
+  eq: ID
+  ge: ID
+  gt: ID
+  le: ID
+  lt: ID
+  ne: ID
+  notContains: ID
+  size: ModelSizeInput
+}
+
+input ModelIntInput {
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  between: [Int]
+  eq: Int
+  ge: Int
+  gt: Int
+  le: Int
+  lt: Int
+  ne: Int
+}
+
+input ModelJobConditionInput {
+  and: [ModelJobConditionInput]
+  createdAt: ModelStringInput
+  description: ModelStringInput
+  jobName: ModelStringInput
+  landfillsID: ModelIDInput
+  not: ModelJobConditionInput
+  or: [ModelJobConditionInput]
+  status: ModelStringInput
+  updatedAt: ModelStringInput
+  userId: ModelStringInput
+}
+
+input ModelJobFilterInput {
+  and: [ModelJobFilterInput]
+  createdAt: ModelStringInput
+  description: ModelStringInput
+  id: ModelIDInput
+  jobName: ModelStringInput
+  landfillsID: ModelIDInput
+  not: ModelJobFilterInput
+  or: [ModelJobFilterInput]
+  status: ModelStringInput
+  updatedAt: ModelStringInput
+  userId: ModelStringInput
+}
+
+input ModelJobTechConditionInput {
+  and: [ModelJobTechConditionInput]
+  appointmentID: ModelIDInput
+  arrivalTime: ModelStringInput
+  createdAt: ModelStringInput
+  dispatchTime: ModelStringInput
+  endTime: ModelStringInput
+  not: ModelJobTechConditionInput
+  or: [ModelJobTechConditionInput]
+  technicianId: ModelIDInput
+  updatedAt: ModelStringInput
+}
+
+input ModelJobTechFilterInput {
+  and: [ModelJobTechFilterInput]
+  appointmentID: ModelIDInput
+  arrivalTime: ModelStringInput
+  createdAt: ModelStringInput
+  dispatchTime: ModelStringInput
+  endTime: ModelStringInput
+  id: ModelIDInput
+  not: ModelJobTechFilterInput
+  or: [ModelJobTechFilterInput]
+  technicianId: ModelIDInput
+  updatedAt: ModelStringInput
+}
+
+input ModelLandfillsConditionInput {
+  active: ModelBooleanInput
+  address: ModelStringInput
+  and: [ModelLandfillsConditionInput]
+  city: ModelStringInput
+  country: ModelStringInput
+  createdAt: ModelStringInput
+  lat: ModelFloatInput
+  lng: ModelFloatInput
+  name: ModelStringInput
+  not: ModelLandfillsConditionInput
+  or: [ModelLandfillsConditionInput]
+  state: ModelStringInput
+  updatedAt: ModelStringInput
+  zip: ModelStringInput
+}
+
+input ModelLandfillsFilterInput {
+  active: ModelBooleanInput
+  address: ModelStringInput
+  and: [ModelLandfillsFilterInput]
+  city: ModelStringInput
+  country: ModelStringInput
+  createdAt: ModelStringInput
+  id: ModelIDInput
+  lat: ModelFloatInput
+  lng: ModelFloatInput
+  name: ModelStringInput
+  not: ModelLandfillsFilterInput
+  or: [ModelLandfillsFilterInput]
+  state: ModelStringInput
+  updatedAt: ModelStringInput
+  zip: ModelStringInput
+}
+
+input ModelServiceConditionInput {
+  and: [ModelServiceConditionInput]
+  completedNotes: ModelStringInput
+  createdAt: ModelStringInput
+  devicesID: ModelIDInput
+  isComplete: ModelBooleanInput
+  not: ModelServiceConditionInput
+  or: [ModelServiceConditionInput]
+  priority: ModelStringInput
+  servicetypesID: ModelIDInput
+  title: ModelStringInput
+  updatedAt: ModelStringInput
+  userId: ModelIDInput
+}
+
+input ModelServiceFilterInput {
+  and: [ModelServiceFilterInput]
+  completedNotes: ModelStringInput
+  createdAt: ModelStringInput
+  devicesID: ModelIDInput
+  id: ModelIDInput
+  isComplete: ModelBooleanInput
+  not: ModelServiceFilterInput
+  or: [ModelServiceFilterInput]
+  priority: ModelStringInput
+  servicetypesID: ModelIDInput
+  title: ModelStringInput
+  updatedAt: ModelStringInput
+  userId: ModelIDInput
+}
+
+input ModelServiceTypesConditionInput {
+  and: [ModelServiceTypesConditionInput]
+  createdAt: ModelStringInput
+  isActive: ModelBooleanInput
+  name: ModelStringInput
+  not: ModelServiceTypesConditionInput
+  or: [ModelServiceTypesConditionInput]
+  updatedAt: ModelStringInput
+}
+
+input ModelServiceTypesFilterInput {
+  and: [ModelServiceTypesFilterInput]
+  createdAt: ModelStringInput
+  id: ModelIDInput
+  isActive: ModelBooleanInput
+  name: ModelStringInput
+  not: ModelServiceTypesFilterInput
+  or: [ModelServiceTypesFilterInput]
+  updatedAt: ModelStringInput
+}
+
+input ModelSizeInput {
+  between: [Int]
+  eq: Int
+  ge: Int
+  gt: Int
+  le: Int
+  lt: Int
+  ne: Int
+}
+
+input ModelStringInput {
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  beginsWith: String
+  between: [String]
+  contains: String
+  eq: String
+  ge: String
+  gt: String
+  le: String
+  lt: String
+  ne: String
+  notContains: String
+  size: ModelSizeInput
+}
+
+input ModelSubscriptionAppointmentFilterInput {
+  and: [ModelSubscriptionAppointmentFilterInput]
+  createdAt: ModelSubscriptionStringInput
+  endTime: ModelSubscriptionStringInput
+  id: ModelSubscriptionIDInput
+  jobID: ModelSubscriptionIDInput
+  or: [ModelSubscriptionAppointmentFilterInput]
+  startTime: ModelSubscriptionStringInput
+  status: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  userId: ModelSubscriptionIDInput
+}
+
+input ModelSubscriptionBooleanInput {
+  eq: Boolean
+  ne: Boolean
+}
+
+input ModelSubscriptionDevicesFilterInput {
+  and: [ModelSubscriptionDevicesFilterInput]
+  createdAt: ModelSubscriptionStringInput
+  deviceName: ModelSubscriptionStringInput
+  deviceType: ModelSubscriptionStringInput
+  flowMeter: ModelSubscriptionStringInput
+  iccid: ModelSubscriptionStringInput
+  id: ModelSubscriptionIDInput
+  landfillsID: ModelSubscriptionIDInput
+  macAddress: ModelSubscriptionStringInput
+  or: [ModelSubscriptionDevicesFilterInput]
+  pipeSize: ModelSubscriptionFloatInput
+  restrictionSize: ModelSubscriptionFloatInput
+  serialNum: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  userId: ModelSubscriptionIDInput
+}
+
+input ModelSubscriptionFloatInput {
+  between: [Float]
+  eq: Float
+  ge: Float
+  gt: Float
+  in: [Float]
+  le: Float
+  lt: Float
+  ne: Float
+  notIn: [Float]
+}
+
+input ModelSubscriptionGasWellsFilterInput {
+  and: [ModelSubscriptionGasWellsFilterInput]
+  createdAt: ModelSubscriptionStringInput
+  gasWellName: ModelSubscriptionStringInput
+  gasWellsDevicesId: ModelSubscriptionIDInput
+  id: ModelSubscriptionIDInput
+  landfillsID: ModelSubscriptionIDInput
+  lat: ModelSubscriptionFloatInput
+  lng: ModelSubscriptionFloatInput
+  or: [ModelSubscriptionGasWellsFilterInput]
+  subtype: ModelSubscriptionStringInput
+  type: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+}
+
+input ModelSubscriptionIDInput {
+  beginsWith: ID
+  between: [ID]
+  contains: ID
+  eq: ID
+  ge: ID
+  gt: ID
+  in: [ID]
+  le: ID
+  lt: ID
+  ne: ID
+  notContains: ID
+  notIn: [ID]
+}
+
+input ModelSubscriptionIntInput {
+  between: [Int]
+  eq: Int
+  ge: Int
+  gt: Int
+  in: [Int]
+  le: Int
+  lt: Int
+  ne: Int
+  notIn: [Int]
+}
+
+input ModelSubscriptionJobFilterInput {
+  and: [ModelSubscriptionJobFilterInput]
+  createdAt: ModelSubscriptionStringInput
+  description: ModelSubscriptionStringInput
+  id: ModelSubscriptionIDInput
+  jobName: ModelSubscriptionStringInput
+  landfillsID: ModelSubscriptionIDInput
+  or: [ModelSubscriptionJobFilterInput]
+  status: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  userId: ModelSubscriptionStringInput
+}
+
+input ModelSubscriptionJobTechFilterInput {
+  and: [ModelSubscriptionJobTechFilterInput]
+  appointmentID: ModelSubscriptionIDInput
+  arrivalTime: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  dispatchTime: ModelSubscriptionStringInput
+  endTime: ModelSubscriptionStringInput
+  id: ModelSubscriptionIDInput
+  or: [ModelSubscriptionJobTechFilterInput]
+  technicianId: ModelSubscriptionIDInput
+  updatedAt: ModelSubscriptionStringInput
+}
+
+input ModelSubscriptionLandfillsFilterInput {
+  active: ModelSubscriptionBooleanInput
+  address: ModelSubscriptionStringInput
+  and: [ModelSubscriptionLandfillsFilterInput]
+  city: ModelSubscriptionStringInput
+  country: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  id: ModelSubscriptionIDInput
+  lat: ModelSubscriptionFloatInput
+  lng: ModelSubscriptionFloatInput
+  name: ModelSubscriptionStringInput
+  or: [ModelSubscriptionLandfillsFilterInput]
+  state: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  zip: ModelSubscriptionStringInput
+}
+
+input ModelSubscriptionServiceFilterInput {
+  and: [ModelSubscriptionServiceFilterInput]
+  completedNotes: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  devicesID: ModelSubscriptionIDInput
+  id: ModelSubscriptionIDInput
+  isComplete: ModelSubscriptionBooleanInput
+  or: [ModelSubscriptionServiceFilterInput]
+  priority: ModelSubscriptionStringInput
+  servicetypesID: ModelSubscriptionIDInput
+  title: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  userId: ModelSubscriptionIDInput
+}
+
+input ModelSubscriptionServiceTypesFilterInput {
+  and: [ModelSubscriptionServiceTypesFilterInput]
+  createdAt: ModelSubscriptionStringInput
+  id: ModelSubscriptionIDInput
+  isActive: ModelSubscriptionBooleanInput
+  name: ModelSubscriptionStringInput
+  or: [ModelSubscriptionServiceTypesFilterInput]
+  updatedAt: ModelSubscriptionStringInput
+}
+
+input ModelSubscriptionStringInput {
+  beginsWith: String
+  between: [String]
+  contains: String
+  eq: String
+  ge: String
+  gt: String
+  in: [String]
+  le: String
+  lt: String
+  ne: String
+  notContains: String
+  notIn: [String]
+}
+
+input UpdateAppointmentInput {
+  endTime: AWSDateTime
+  id: ID!
+  jobID: ID
+  startTime: AWSDateTime
+  status: String
+  userId: ID
+}
+
+input UpdateDevicesInput {
+  deviceName: String
+  deviceType: String
+  flowMeter: String
+  iccid: String
+  id: ID!
+  landfillsID: ID
+  macAddress: String
+  pipeSize: Float
+  restrictionSize: Float
+  serialNum: String
+  userId: ID
+}
+
+input UpdateGasWellsInput {
+  gasWellName: String
+  gasWellsDevicesId: ID
+  id: ID!
+  landfillsID: ID
+  lat: Float
+  lng: Float
+  subtype: String
+  type: String
+}
+
+input UpdateJobInput {
+  description: String
+  id: ID!
+  jobName: String
+  landfillsID: ID
+  status: String
+  userId: String
+}
+
+input UpdateJobTechInput {
+  appointmentID: ID
+  arrivalTime: AWSDateTime
+  dispatchTime: AWSDateTime
+  endTime: AWSDateTime
+  id: ID!
+  technicianId: ID
+}
+
+input UpdateLandfillsInput {
+  active: Boolean
+  address: String
+  city: String
+  country: String
+  id: ID!
+  lat: Float
+  lng: Float
+  name: String
+  state: String
+  zip: String
+}
+
+input UpdateServiceInput {
+  completedNotes: String
+  devicesID: ID
+  id: ID!
+  isComplete: Boolean
+  priority: String
+  servicetypesID: ID
+  title: String
+  userId: ID
+}
+
+input UpdateServiceTypesInput {
+  id: ID!
+  isActive: Boolean
+  name: String
 }

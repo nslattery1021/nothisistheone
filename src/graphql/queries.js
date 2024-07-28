@@ -5,8 +5,22 @@ export const getJobTech = /* GraphQL */ `
   query GetJobTech($id: ID!) {
     getJobTech(id: $id) {
       id
-      userId
+      technicianId
       appointmentID
+      dispatchTime
+      arrivalTime
+      endTime
+      Appointment {
+        id
+        startTime
+        endTime
+        status
+        jobID
+        userId
+        createdAt
+        updatedAt
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -22,8 +36,11 @@ export const listJobTeches = /* GraphQL */ `
     listJobTeches(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
-        userId
+        technicianId
         appointmentID
+        dispatchTime
+        arrivalTime
+        endTime
         createdAt
         updatedAt
         __typename
@@ -50,8 +67,11 @@ export const jobTechesByAppointmentID = /* GraphQL */ `
     ) {
       items {
         id
-        userId
+        technicianId
         appointmentID
+        dispatchTime
+        arrivalTime
+        endTime
         createdAt
         updatedAt
         __typename
@@ -73,6 +93,18 @@ export const getAppointment = /* GraphQL */ `
         nextToken
         __typename
       }
+      userId
+      Job {
+        id
+        jobName
+        description
+        status
+        userId
+        landfillsID
+        createdAt
+        updatedAt
+        __typename
+      }
       createdAt
       updatedAt
       __typename
@@ -92,6 +124,7 @@ export const listAppointments = /* GraphQL */ `
         endTime
         status
         jobID
+        userId
         createdAt
         updatedAt
         __typename
@@ -122,6 +155,7 @@ export const appointmentsByJobID = /* GraphQL */ `
         endTime
         status
         jobID
+        userId
         createdAt
         updatedAt
         __typename
@@ -142,6 +176,8 @@ export const getJob = /* GraphQL */ `
         nextToken
         __typename
       }
+      userId
+      landfillsID
       createdAt
       updatedAt
       __typename
@@ -160,6 +196,39 @@ export const listJobs = /* GraphQL */ `
         jobName
         description
         status
+        userId
+        landfillsID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const jobsByLandfillsID = /* GraphQL */ `
+  query JobsByLandfillsID(
+    $landfillsID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelJobFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    jobsByLandfillsID(
+      landfillsID: $landfillsID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        jobName
+        description
+        status
+        userId
+        landfillsID
         createdAt
         updatedAt
         __typename
@@ -510,6 +579,10 @@ export const getLandfills = /* GraphQL */ `
         __typename
       }
       Devices {
+        nextToken
+        __typename
+      }
+      Jobs {
         nextToken
         __typename
       }
